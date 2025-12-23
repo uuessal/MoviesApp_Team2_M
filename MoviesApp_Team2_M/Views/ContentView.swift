@@ -3,7 +3,7 @@
 //  MoviesApp_Team2_M
 //
 //  Created by wessal hashim alharbi on 23/12/2025.
-//
+//  MoviesApp
 
 import SwiftUI
 
