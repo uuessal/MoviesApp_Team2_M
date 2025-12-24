@@ -11,81 +11,133 @@ struct MoviesCenterView: View {
     
     @State private var searchText: String = ""
     var body: some View {
+        
         NavigationStack {
             
-            
-            
-            //محتوى الصفحة هنا
-            
-            
             ScrollView(.vertical){
-                VStack (alignment: .leading){
+            VStack (alignment: .leading){
+                
+                
+//high rated
+                
+                Text("High rated").font(Font.title).bold()
+                ScrollView(.horizontal){
+                 HStack{
+                     
+                     
+                     ForEach(mockData.FakemoviesList , id: \.id) { Movie in
+                         ZStack (alignment: .bottomLeading) {
+                             AsyncImage(url: URL(string: Movie.poster)) { image in
+                                 image
+                                     .resizable()
+                                     .scaledToFit().cornerRadius(10).frame(width: 366, height: 434)
+                                 
+                                 
+                             } placeholder: {
+                                 
+                                 
+                             }
+                             
+                             VStack (alignment: .leading , spacing: 0.3){
+                                 
+                                 Text(Movie.name).font(Font.title.bold()).foregroundColor(.white)
+                                 
+                                 HStack (spacing: 0.1) {
+                                     
+                                     Image("filled")
+                                     Image("filled")
+                                     Image("filled")
+                                     Image("filled")
+                                     Image("unfilled")
+
+                                 }
+                                 
+                                 HStack {
+                                     Text(String(format: "%.1f",Movie.IMDb_rating)).font(Font.title2.bold()).foregroundColor(.white)
+                                     Text("out of 5").font(Font.title3.bold()).foregroundColor(.white)
+                                 }
+                                 
+                                 HStack (spacing: 0.4){
+                                     ForEach(Movie.genre, id: \.self) { genre in
+                                         Text("\(genre)") }
+                                     Text(".\(Movie.runtime)")
+                                 }
+                                 
+
+                                 
+                             }.padding()
+                             
+                             
+                         }}
                     
-                    Text("High rated").font(Font.title).bold()
-                    
-                    
-                    
-                    ScrollView(.horizontal){
-                        
-                        HStack{
-                            
-                            
-                            Rectangle().fill(Color.blue)
-                                .frame(width: 366 , height: 434)
-                            
+                     
+                     
+                     
                             //  width: 366 , height: 434  حجمه بفيقما
-                            
                             Rectangle().fill(Color.blue)
                                 .frame(width: 366 , height: 434)
-                            
-                            
                         }}
                     
+//genre
+                
+                //drama
+                     
+                
+                HStack{
+                  Text("Drama").font(Font.title2).bold()
+                  Spacer()
+                    Text("Show more").foregroundColor(.yellow)
+                
+                }
+              ScrollView(.horizontal){
+                  HStack{
+                      
+                      
+                      ForEach(mockData.FakemoviesList , id: \.id) { Movie in
+                          
+                          if (Movie.genre.contains("drama")){
+                              
+                              AsyncImage(url: URL(string: Movie.poster)) { image in
+                                  image
+                                      .resizable()
+                                      .scaledToFit().cornerRadius(10).frame(width: 208, height: 275)
+                              } placeholder: {
+
+                              }
+                              
+                          }
+                      }
+                   
+                      
+                      
+                      
+                  }}
+                
+                //comedy
+                
                     HStack{
-                        Text("Drama").font(Font.headline).bold()
+                        Text("Comedy").font(Font.title2).bold()
                         Spacer()
-                        Text("Show more")
-                        
-                        
-                    }
-                    
+                        Text("Show more").foregroundColor(.yellow) }
                     
                     ScrollView(.horizontal){
                         HStack{
                             
-                            
-                            Rectangle().fill(Color.blue)
-                                .frame(width: 208 , height: 275)
-                            Rectangle().fill(Color.blue)
-                                .frame(width: 208 , height: 275)
-                            Rectangle().fill(Color.blue)
-                                .frame(width: 208 , height: 275)
-                            //  width: 208 , height: 275  حجمه بفيقما
-                            
-                            
-                            
-                        }}
-                    
-                    HStack{
-                        Text("Comedy").font(Font.headline).bold()
-                        Spacer()
-                        Text("Show more")
-                        
-                        
-                    }
-                    
-                    
-                    ScrollView(.horizontal){
-                        HStack{
-                            
-                            
-                            Rectangle().fill(Color.blue)
-                                .frame(width: 208 , height: 275)
-                            Rectangle().fill(Color.blue)
-                                .frame(width: 208 , height: 275)
-                            Rectangle().fill(Color.blue)
-                                .frame(width: 208 , height: 275)
-                            //  width: 208 , height: 275  حجمه بفيقما
+                            ForEach (mockData.FakemoviesList , id: \.id) { Movie in
+                                
+                                if (Movie.genre .contains("comedy")){
+                                    
+                                    AsyncImage(url: URL(string: Movie.poster)) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFit().cornerRadius(10).frame(width: 208, height: 275)
+                                    } placeholder: {
+                                        //  ProgressView() // لودينق
+                                    }
+                                    
+                                }
+                            }
+                           
                             
                             
                             
@@ -93,32 +145,24 @@ struct MoviesCenterView: View {
                     
                     
                     
-                    Spacer()
-                    
-                    
-                    
-                    
+                 
+Spacer()
                     
                     
                 }.frame(maxWidth: .infinity, alignment: .leading)
                 
-                
-                
-                
-                
-                
-                
-                
-                
-                
                     .navigationTitle("Movie Center")
                     .searchable(text:$searchText,placement: .navigationBarDrawer, prompt: "Serach Movie")
+                
+                
                 
                 
             } .padding(.horizontal)
         }
     }}
 
+
+
 #Preview {
-    MoviesCenterView()
+    MoviesCenterView().preferredColorScheme(.dark)
 }
