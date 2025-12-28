@@ -28,6 +28,8 @@ struct MoviesDetailsView: View {
                 CastSection()
 
                 ReviewsSection()
+                
+                WriteReviewButton()
             }
             .padding(.bottom, 32)
         }
@@ -66,9 +68,9 @@ struct HeaderImageSection: View {
                     }
                 }
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top, 50)
             .foregroundColor(.yellow)
-            .symbolRenderingMode(.palette)
         }
     }
 }
@@ -274,30 +276,86 @@ struct ReviewCardView: View {
     let review: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(userName)
-                .font(.subheadline)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
+        VStack(alignment: .leading, spacing: 16) {
 
-            HStack(spacing: 4) {
-                ForEach(0..<5) { _ in
-                    Image(systemName: "star.fill")
-                        .font(.caption2)
-                        .foregroundColor(.yellow)
+            // Header (Avatar + Name + Stars)
+            HStack(alignment: .top, spacing: 12) {
+                // Avatar
+                Circle()
+                    .fill(Color.gray.opacity(0.4))
+                    .frame(width: 44, height: 44)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(userName)
+                        .font(.body)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+
+                    HStack(spacing: 4) {
+                        ForEach(0..<3) { _ in
+                            Image(systemName: "star.fill")
+                                .font(.caption)
+                                .foregroundColor(.yellow)
+                        }
+                        ForEach(0..<2) { _ in
+                            Image(systemName: "star")
+                                .font(.caption)
+                                .foregroundColor(.yellow)
+                        }
+                    }
                 }
             }
 
+            // Review text
             Text(review)
-                .font(.caption)
-                .foregroundColor(.gray)
+                .font(.body)
+                .foregroundColor(.white)
+                .fixedSize(horizontal: false, vertical: true)
+
+            // Date
+            HStack {
+                Spacer()
+                Text("Tuesday")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
         }
-        .padding()
-        .frame(width: 240)
-        .background(Color.gray.opacity(0.2))
-        .cornerRadius(16)
+        .padding(16)
+        .frame(width: 300)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white.opacity(0.08))
+        )
     }
 }
+
+// Review Button
+struct WriteReviewButton: View {
+    var body: some View {
+        Button(action: {
+            // add review action later
+        }) {
+            HStack(spacing: 12) {
+                Image(systemName: "square.and.pencil")
+                    .font(.body)
+
+                Text("Write a review")
+                    .font(.title3)
+                    .fontWeight(.medium)
+            }
+            .foregroundColor(.yellow)
+            .frame(maxWidth: .infinity)
+            .frame(height: 30)
+            .padding(.vertical, 14)
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(Color.yellow, lineWidth: 1.5)
+            )
+            .padding(.horizontal, 16)
+        }
+    }
+}
+
 
 // Preview
 #Preview {
