@@ -42,38 +42,51 @@ struct MoviesDetailsView: View {
 
 // Header Image
 struct HeaderImageSection: View {
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        ZStack {
             Image("movie_placeholder")
                 .resizable()
                 .scaledToFill()
                 .frame(height: 320)
                 .clipped()
-
-            HStack {
-                Button(action: {}) {
+        }
+        .toolbar {
+            // Back Button
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
                     Image(systemName: "chevron.left")
-                        .font(.title3)
-                }
-
-                Spacer()
-
-                HStack(spacing: 20) {
-                    Button(action: {}) {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                    Button(action: {}) {
-                        Image(systemName: "bookmark")
-                        
-                    }
+                        .foregroundColor(.yellow)
                 }
             }
-            .padding(.horizontal)
-            .padding(.top, 50)
-            .foregroundColor(.yellow)
+
+            // Share Button
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    
+                }) {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundColor(.yellow)
+                }
+            }
+
+            // Bookmark Button
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    
+                }) {
+                    Image(systemName: "bookmark")
+                        .foregroundColor(.yellow)
+                }
+            }
         }
     }
 }
+
+
 
 // Movie Title
 struct MovieTitleSection: View {
@@ -332,9 +345,9 @@ struct ReviewCardView: View {
 // Review Button
 struct WriteReviewButton: View {
     var body: some View {
-        Button(action: {
-            // add review action later
-        }) {
+        NavigationLink {
+           AddReviewView()
+        } label: {
             HStack(spacing: 12) {
                 Image(systemName: "square.and.pencil")
                     .font(.body)
@@ -359,5 +372,7 @@ struct WriteReviewButton: View {
 
 // Preview
 #Preview {
-    MoviesDetailsView()
+    NavigationStack {
+        MoviesDetailsView()
+    }
 }
