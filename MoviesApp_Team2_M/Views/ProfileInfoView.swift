@@ -1,4 +1,12 @@
 //
+//  ProfileInfoView.swift
+//  MoviesApp_Team2_M
+//
+//  Created by Shahd Muharrq on 10/07/1447 AH.
+//
+
+
+//
 //  EditProfile.swift
 //  MoviesApp_Team2_M
 //
