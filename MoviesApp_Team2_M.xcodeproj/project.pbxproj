@@ -29,9 +29,33 @@
 		C1CFBB0E2EFA757E00884CD5 /* MoviesApp_Team2_MUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoviesApp_Team2_MUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B4BE3DBB2F03BCC1002AEB86 /* Exceptions for "MoviesApp_Team2_M" folder in "MoviesApp_Team2_M" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"ViewModels/movie-details._VMswift",
+			);
+			target = C1CFBAF62EFA757D00884CD5 /* MoviesApp_Team2_M */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		B4BE3DBC2F03BCC1002AEB86 /* Exceptions for "MoviesApp_Team2_M" folder in "Compile Sources" phase from "MoviesApp_Team2_M" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = C1CFBAF32EFA757D00884CD5 /* Sources */;
+			membershipExceptions = (
+				"ViewModels/movie-details._VMswift",
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C1CFBAF92EFA757D00884CD5 /* MoviesApp_Team2_M */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B4BE3DBB2F03BCC1002AEB86 /* Exceptions for "MoviesApp_Team2_M" folder in "MoviesApp_Team2_M" target */,
+				B4BE3DBC2F03BCC1002AEB86 /* Exceptions for "MoviesApp_Team2_M" folder in "Compile Sources" phase from "MoviesApp_Team2_M" target */,
+			);
 			path = MoviesApp_Team2_M;
 			sourceTree = "<group>";
 		};
