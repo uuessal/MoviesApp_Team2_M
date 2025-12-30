@@ -26,4 +26,26 @@ struct APIClient {
         let (data, _) = try await URLSession.shared.data(for: request)
         return data
     }
+    
+    
+    
+    static func post(_ endpoint: String) async throws -> Data {
+        guard let url = URL(string: baseURL + endpoint) else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(APIKey.airtable)",forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+
+        let (data, _) = try await URLSession.shared.data(for: request)
+        return data
+    }
+    
+    
+    
+    
 }

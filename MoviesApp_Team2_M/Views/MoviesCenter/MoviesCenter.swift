@@ -16,6 +16,17 @@ struct MoviesCenterView: View {
 
     @State private var searchText: String = ""
     
+    private var filteredMovies: [Movie] {
+        if searchText.isEmpty {
+            return moviesList
+        } else {
+            return moviesList.filter { movie in
+                movie.fields.name.lowercased().contains(searchText.lowercased())
+            }
+        }
+    }
+
+    
     var body: some View {
         NavigationStack {
             ScrollView(.vertical){
@@ -23,17 +34,19 @@ struct MoviesCenterView: View {
                 
                 
 //high rated
-                                    
+                if (searchText.isEmpty) {
                     HighRated(moviesList: moviesList)
                     
+                    Genre(moviesList: moviesList)}
                 
-//genre
-                
-                
-                  Genre(moviesList: moviesList)
+                else{
+                    Genre(moviesList: filteredMovies)
+
+                    }
                     
+                
                     
-                 
+              
 Spacer()
                     
                     
@@ -41,6 +54,7 @@ Spacer()
                 
                     .navigationTitle("Movie Center")
                     .searchable(text:$searchText,placement: .navigationBarDrawer, prompt: "Serach Movie")
+                
                 
                 
                 
