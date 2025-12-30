@@ -9,6 +9,11 @@ import SwiftUI
 
 // Main View
 struct MoviesDetailsView: View {
+    
+    
+    @State var ReviewsList: [Review] = []
+    
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
@@ -27,11 +32,20 @@ struct MoviesDetailsView: View {
 
                 CastSection()
 
-                ReviewsSection()
+                ReviewsSection(ReviewsList: ReviewsList)
                 
                 WriteReviewButton()
             }
             .padding(.bottom, 32)
+            .task {
+            do {
+                ReviewsList = try await fetchReviewsFromAPI()
+        
+                print(ReviewsList)
+            } catch {
+                print(error)
+            }
+        }
         }
         .background(Color.black)
         .ignoresSafeArea(edges: .top)
@@ -245,44 +259,10 @@ struct CastItemView: View {
     }
 }
 
+
 // Reviews Section
-struct ReviewsSection: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Rating & Reviews")
-                .font(.title3)
-                .foregroundColor(.white)
-            
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text("4.8")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                
-                Text("out of 5")
-                    .font(.body)
-                //.fontWeight(.bold)
-                .foregroundColor(.gray)
-            }
+// حطيته بملف لحال
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ReviewCardView(
-                        userName: "Afnan Abdullah",
-                        review: "This is an engagingly simple, good-hearted film with contrast and relief."
-                    )
-
-                    ReviewCardView(
-                        userName: "User Name",
-                        review: "A powerful story about hope and friendship."
-                    )
-                }
-            }
-        }
-        .padding(.horizontal)
-    }
-}
 
 struct ReviewCardView: View {
     let userName: String
