@@ -15,3 +15,9 @@ func fetchMoviesFromAPI() async throws -> [Movie] {
 }
 
 
+func fetchMovieDetailsFromAPI(movieId: String) async throws -> Movie {
+    let data = try await APIClient.fetch("/movies/\(movieId)")
+    let decoded = try JSONDecoder().decode(Movie.self, from: data)
+    return decoded
+}
+

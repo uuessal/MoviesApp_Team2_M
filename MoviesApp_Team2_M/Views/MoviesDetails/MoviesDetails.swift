@@ -10,61 +10,107 @@ import SwiftUI
 // Main View
 struct MoviesDetailsView: View {
     
-    
-    @State var ReviewsList: [Review] = []
-    
+    @StateObject private var viewModel = MovieDetailsViewModel()
+    let movieId: String
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            if viewModel.isLoading {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .yellow))
+                    .scaleEffect(1.5)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.top, 100)
+            } else if let movie = viewModel.movie {
+                VStack(alignment: .leading, spacing: 24) {
 
-                HeaderImageSection()
+                    HeaderImageSection(posterURL: movie.fields.poster)
 
-                MovieTitleSection()
+                    MovieTitleSection(title: movie.fields.name)
 
-                MovieInfoGrid()
+                    MovieInfoGrid(
+                        duration: movie.fields.runtime,
+                        language: movie.fields.language.joined(separator: ", "),
+                        genre: movie.fields.genre.joined(separator: ", "),
+                        age: movie.fields.rating
+                    )
 
-                StorySection()
+                    StorySection(story: movie.fields.story)
 
-                IMDBRatingSection()
+                    IMDBRatingSection(rating: movie.fields.IMDb_rating)
 
-                DirectorSection()
+                    DirectorSection(directors: viewModel.directors)
 
-                CastSection()
+                    CastSection()
 
-                ReviewsSection(ReviewsList: ReviewsList)
-                
-                WriteReviewButton()
+                    ReviewsSection(ReviewsList: viewModel.reviewsList)
+                    
+                    WriteReviewButton()
+                }
+                .padding(.bottom, 32)
+            } else if let errorMessage = viewModel.errorMessage {
+                VStack(spacing: 16) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 50))
+                        .foregroundColor(.yellow)
+                    
+                    Text("Error loading movie")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                    
+                    Text(errorMessage)
+                        .font(.body)
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.top, 100)
             }
-            .padding(.bottom, 32)
-            .task {
-            do {
-                ReviewsList = try await fetchReviewsFromAPI()
-        
-                print(ReviewsList)
-            } catch {
-                print(error)
-            }
-        }
         }
         .background(Color.black)
         .ignoresSafeArea(edges: .top)
+        .task {
+            await viewModel.loadData(movieId: movieId)
+        }
     }
 }
-
 
 
 // Header Image
 struct HeaderImageSection: View {
     @Environment(\.dismiss) private var dismiss
+    let posterURL: String
 
     var body: some View {
         ZStack {
-            Image("movie_placeholder")
-                .resizable()
-                .scaledToFill()
-                .frame(height: 320)
-                .clipped()
+            AsyncImage(url: URL(string: posterURL)) { phase in
+                switch phase {
+                case .empty:
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.3))
+                        .overlay(
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .yellow))
+                        )
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                case .failure:
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.3))
+                        .overlay(
+                            Image(systemName: "photo")
+                                .font(.system(size: 50))
+                                .foregroundColor(.gray)
+                        )
+                @unknown default:
+                    EmptyView()
+                }
+            }
+            .frame(height: 320)
+            .clipped()
         }
         .toolbar {
             // Back Button
@@ -104,8 +150,10 @@ struct HeaderImageSection: View {
 
 // Movie Title
 struct MovieTitleSection: View {
+    let title: String
+    
     var body: some View {
-        Text("Shawshank")
+        Text(title)
             .font(.largeTitle)
             .fontWeight(.bold)
             .foregroundColor(.white)
@@ -115,6 +163,11 @@ struct MovieTitleSection: View {
 
 // Movie Info Grid
 struct MovieInfoGrid: View {
+    let duration: String
+    let language: String
+    let genre: String
+    let age: String
+    
     let columns = [
         GridItem(.flexible(), alignment: .leading),
         GridItem(.flexible(), alignment: .leading)
@@ -122,10 +175,10 @@ struct MovieInfoGrid: View {
 
     var body: some View {
         LazyVGrid(columns: columns, spacing: 12) {
-            InfoItemView(title: "Duration", value: "2 hours 22 mins")
-            InfoItemView(title: "Language", value: "English")
-            InfoItemView(title: "Genre", value: "Drama")
-            InfoItemView(title: "Age", value: "+15")
+            InfoItemView(title: "Duration", value: duration)
+            InfoItemView(title: "Language", value: language)
+            InfoItemView(title: "Genre", value: genre)
+            InfoItemView(title: "Age", value: age)
         }
         .padding(.horizontal, 20)
     }
@@ -153,13 +206,15 @@ struct InfoItemView: View {
 
 // Story Section
 struct StorySection: View {
+    let story: String
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Story")
                 .font(.title3)
                 .foregroundColor(.white)
 
-            Text("Synopsis. In 1947, Andy Dufresne is convicted of murder and sent to Shawshank prison, where he forms a friendship and finds hope.")
+            Text(story)
                 .font(.body)
                 .foregroundColor(.gray)
         }
@@ -169,13 +224,15 @@ struct StorySection: View {
 
 // IMDb Rating
 struct IMDBRatingSection: View {
+    let rating: Double
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("IMDb Rating")
                 .font(.title3)
                 .foregroundColor(.white)
 
-            Text("9.3 / 10")
+            Text("\(String(format: "%.1f", rating)) / 10")
                 .font(.body)
                 .fontWeight(.bold)
                 .foregroundColor(.gray)
@@ -186,41 +243,79 @@ struct IMDBRatingSection: View {
 
 // Director Section
 struct DirectorSection: View {
+    let directors: [Director]
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Director")
                 .font(.title3)
                 .foregroundColor(.white)
             
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    DirectorItemView(name: "Tim Robbins")
+            if directors.isEmpty {
+                Text("No director information available")
+                    .font(.body)
+                    .foregroundColor(.gray)
+                    .padding(.leading)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(directors) { director in
+                            DirectorItemView(
+                                name: director.fields.name,
+                                imageURL: director.fields.image
+                            )
+                        }
+                    }
                 }
             }
-            
         }
         .padding(.horizontal)
     }
 }
 
-
 struct DirectorItemView: View {
     let name: String
+    let imageURL: String
 
     var body: some View {
         VStack(spacing: 8) {
-            Circle()
-                .fill(Color.gray.opacity(0.4))
-                .frame(width: 70, height: 70)
+            AsyncImage(url: URL(string: imageURL)) { phase in
+                switch phase {
+                case .empty:
+                    Circle()
+                        .fill(Color.gray.opacity(0.4))
+                        .overlay(
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .yellow))
+                                .scaleEffect(0.7)
+                        )
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .clipShape(Circle())
+                case .failure:
+                    Circle()
+                        .fill(Color.gray.opacity(0.4))
+                        .overlay(
+                            Image(systemName: "person.fill")
+                                .foregroundColor(.gray)
+                        )
+                @unknown default:
+                    EmptyView()
+                }
+            }
+            .frame(width: 70, height: 70)
 
             Text(name)
                 .font(.body)
                 .foregroundColor(.gray)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
         }
         .frame(width: 100)
     }
 }
-
 
 // Cast Section
 struct CastSection: View {
@@ -353,6 +448,6 @@ struct WriteReviewButton: View {
 // Preview
 #Preview {
     NavigationStack {
-        MoviesDetailsView()
+        MoviesDetailsView(movieId: "reckJmZ458CZcLlUd")
     }
 }
