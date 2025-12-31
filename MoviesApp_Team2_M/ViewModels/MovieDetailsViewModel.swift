@@ -12,6 +12,7 @@ import Foundation
 class MovieDetailsViewModel: ObservableObject {
     @Published var movie: Movie?
     @Published var directors: [Director] = []
+    @Published var actors: [Actor] = []
     @Published var reviewsList: [Review] = []
     @Published var isLoading = true
     @Published var errorMessage: String?
@@ -23,6 +24,9 @@ class MovieDetailsViewModel: ObservableObject {
             
             // Fetch directors for this movie
             directors = try await fetchDirectorsForMovie(movieId: movieId)
+            
+            // Fetch actors for this movie
+            actors = try await fetchActorsForMovie(movieId: movieId)
             
             // Fetch reviews
             reviewsList = try await fetchReviewsFromAPI()

@@ -24,9 +24,7 @@ struct MoviesDetailsView: View {
             } else if let movie = viewModel.movie {
                 VStack(alignment: .leading, spacing: 24) {
 
-                    HeaderImageSection(posterURL: movie.fields.poster)
-
-                    MovieTitleSection(title: movie.fields.name)
+                    HeaderImageSection(posterURL: movie.fields.poster, title: movie.fields.name)
 
                     MovieInfoGrid(
                         duration: movie.fields.runtime,
@@ -41,7 +39,7 @@ struct MoviesDetailsView: View {
 
                     DirectorSection(directors: viewModel.directors)
 
-                    CastSection()
+                    CastSection(actors: viewModel.actors)
 
                     ReviewsSection(ReviewsList: viewModel.reviewsList)
                     
@@ -81,9 +79,10 @@ struct MoviesDetailsView: View {
 struct HeaderImageSection: View {
     @Environment(\.dismiss) private var dismiss
     let posterURL: String
+    let title: String
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottomLeading) {
             AsyncImage(url: URL(string: posterURL)) { phase in
                 switch phase {
                 case .empty:
@@ -109,8 +108,17 @@ struct HeaderImageSection: View {
                     EmptyView()
                 }
             }
-            .frame(height: 320)
+            .frame(height: 429)
             .clipped()
+            
+            // Title overlay at bottom left
+            Text(title)
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+                .shadow(color: .black.opacity(0.7), radius: 10, x: 0, y: 0)
         }
         .toolbar {
             // Back Button
@@ -146,20 +154,6 @@ struct HeaderImageSection: View {
     }
 }
 
-
-
-// Movie Title
-struct MovieTitleSection: View {
-    let title: String
-    
-    var body: some View {
-        Text(title)
-            .font(.largeTitle)
-            .fontWeight(.bold)
-            .foregroundColor(.white)
-            .padding(.horizontal)
-    }
-}
 
 // Movie Info Grid
 struct MovieInfoGrid: View {
@@ -319,17 +313,29 @@ struct DirectorItemView: View {
 
 // Cast Section
 struct CastSection: View {
+    let actors: [Actor]
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Stars")
                 .font(.title3)
                 .foregroundColor(.white)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    CastItemView(name: "Tim Robbins")
-                    CastItemView(name: "Morgan")
-                    CastItemView(name: "Bob Gunton")
+            if actors.isEmpty {
+                Text("No cast information available")
+                    .font(.body)
+                    .foregroundColor(.gray)
+                    .padding(.leading)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(actors) { actor in
+                            CastItemView(
+                                name: actor.fields.name,
+                                imageURL: actor.fields.image
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -339,16 +345,43 @@ struct CastSection: View {
 
 struct CastItemView: View {
     let name: String
+    let imageURL: String
 
     var body: some View {
         VStack(spacing: 8) {
-            Circle()
-                .fill(Color.gray.opacity(0.4))
-                .frame(width: 70, height: 70)
+            AsyncImage(url: URL(string: imageURL)) { phase in
+                switch phase {
+                case .empty:
+                    Circle()
+                        .fill(Color.gray.opacity(0.4))
+                        .overlay(
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .yellow))
+                                .scaleEffect(0.7)
+                        )
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .clipShape(Circle())
+                case .failure:
+                    Circle()
+                        .fill(Color.gray.opacity(0.4))
+                        .overlay(
+                            Image(systemName: "person.fill")
+                                .foregroundColor(.gray)
+                        )
+                @unknown default:
+                    EmptyView()
+                }
+            }
+            .frame(width: 70, height: 70)
 
             Text(name)
                 .font(.body)
                 .foregroundColor(.gray)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
         }
         .frame(width: 100)
     }

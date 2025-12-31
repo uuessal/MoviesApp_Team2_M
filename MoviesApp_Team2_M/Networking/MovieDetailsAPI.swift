@@ -7,6 +7,7 @@
 
 import Foundation
 
+//DIRECTORS
 // Fetch all directors
 func fetchDirectorsFromAPI() async throws -> [Director] {
     let data = try await APIClient.fetch("/directors")
@@ -44,4 +45,45 @@ func fetchDirectorsForMovie(movieId: String) async throws -> [Director] {
     let movieDirectors = allDirectors.filter { directorIds.contains($0.id) }
     
     return movieDirectors
+}
+
+
+//ACTORS
+// Fetch all actors
+func fetchActorsFromAPI() async throws -> [Actor] {
+    let data = try await APIClient.fetch("/actors")
+    let decoded = try JSONDecoder().decode(ActorsResponse.self, from: data)
+    return decoded.records
+}
+
+// Fetch all movie-actor relationships
+func fetchMovieActorsRelationshipsFromAPI() async throws -> [MovieActor] {
+    let data = try await APIClient.fetch("/movie_actors")
+    let decoded = try JSONDecoder().decode(MovieActorsResponse.self, from: data)
+    return decoded.records
+}
+
+// Fetch actors for a specific movie
+func fetchActorsForMovie(movieId: String) async throws -> [Actor] {
+    // Fetch all relationships
+    let relationships = try await fetchMovieActorsRelationshipsFromAPI()
+    
+    // Filter relationships for this movie
+    let movieRelationships = relationships.filter { $0.fields.movie_id == movieId }
+    
+    // If no actors found, return empty array
+    if movieRelationships.isEmpty {
+        return []
+    }
+    
+    // Get actor IDs for this movie
+    let actorIds = movieRelationships.map { $0.fields.actor_id }
+    
+    // Fetch all actors
+    let allActors = try await fetchActorsFromAPI()
+    
+    // Filter actors based on the IDs
+    let movieActors = allActors.filter { actorIds.contains($0.id) }
+    
+    return movieActors
 }
