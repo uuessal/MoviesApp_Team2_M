@@ -121,15 +121,6 @@ struct HeaderImageSection: View {
                 .shadow(color: .black.opacity(0.7), radius: 10, x: 0, y: 0)
         }
         .toolbar {
-            // Back Button
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.yellow)
-                }
-            }
 
             // Share Button
             ToolbarItem(placement: .navigationBarTrailing) {

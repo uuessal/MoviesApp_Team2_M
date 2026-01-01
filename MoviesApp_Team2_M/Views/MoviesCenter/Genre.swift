@@ -5,14 +5,11 @@
 //  Created by wessal hashim alharbi on 30/12/2025.
 //
 
-
 import SwiftUI
 
 struct Genre : View {
     
     let moviesList : [Movie]
-    
-    
     
     var allGenres: [String] {
         Array(Set(moviesList.flatMap { $0.fields.genre }))
@@ -27,18 +24,14 @@ struct Genre : View {
                 
                 
                 
-                Text(genre).font(Font.title2).bold()
+                Text(genre).font(Font.title).bold()
                 Spacer()
                 Text("Show more").foregroundColor(.yellow)
                 
             }.padding()
+
             
-            
-            
-            
-            
-            
-            
+                        
             ScrollView(.horizontal){
                 HStack{
                     
@@ -47,38 +40,25 @@ struct Genre : View {
                         
                         if (Movie.fields.genre.contains(genre)){
                             
-                            AsyncImage(url: URL(string: Movie.fields.poster)) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 208, height: 275)
-                                    .clipped()
-                                    .cornerRadius(10)
-                                
-                            } placeholder: {
-                                
+                            NavigationLink(destination: MoviesDetailsView(movieId: Movie.id)) {
+                                AsyncImage(url: URL(string: Movie.fields.poster)) { image in
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 208, height: 275)
+                                        .clipped()
+                                        .cornerRadius(10)
+                                    
+                                } placeholder: {
+                                    
+                                }
                             }
-                            
+                            .buttonStyle(PlainButtonStyle())
+
                         }
                     }
-                    
-                    
-                    
-                    
                 }
-                
             }
-            
-            
-            
-            
-            
-            
         }
-        
-        
     }
-            
-            
-        }
-    
+}

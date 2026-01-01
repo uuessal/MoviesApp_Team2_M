@@ -21,37 +21,39 @@ struct HighRated : View {
                 
                 ForEach(moviesList.sorted{ $0.fields.IMDb_rating/2 > $1.fields.IMDb_rating/2} .prefix(5), id: \.id) { Movie in
                     if (Movie.fields.IMDb_rating>=4.0){
-                        ZStack (alignment: .bottomLeading) {
-                            AsyncImage(url: URL(string: Movie.fields.poster)) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFill()                                          .frame(width: 366, height: 434)
-                                    .clipped()
-                                    .cornerRadius(5)
-                                
-                                
-                            } placeholder: {
-                                
-                                
-                            }
-                            
-                            VStack (alignment: .leading , spacing: 0.3){
-                                
-                                Text(Movie.fields.name).font(Font.title.bold()).foregroundColor(.white)
-                                
-                                HStack(spacing:0.4) {
-                                    ForEach(0..<5) { star in
-                                        if(star < Int(Movie.fields.IMDb_rating/2)){
-                                            Image(systemName: "star.fill")
-                                                .font(.caption2)
-                                                .foregroundColor(.yellow)
-                                        }
-                                        else{
-                                            Image(systemName: "star")
-                                                .font(.caption2)
-                                                .foregroundColor(.yellow)
-                                        }}
+                        NavigationLink(destination: MoviesDetailsView(movieId: Movie.id)) {
+                            ZStack (alignment: .bottomLeading) {
+                                AsyncImage(url: URL(string: Movie.fields.poster)) { image in
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 366, height: 434)
+                                        .clipped()
+                                        .cornerRadius(5)
+                                    
+                                    
+                                } placeholder: {
+                                    
+                                    
                                 }
+                                
+                                VStack (alignment: .leading , spacing: 0.3){
+                                    
+                                    Text(Movie.fields.name).font(Font.title.bold()).foregroundColor(.white)
+                                    
+                                    HStack(spacing:0.4) {
+                                        ForEach(0..<5) { star in
+                                            if(star < Int(Movie.fields.IMDb_rating/2)){
+                                                Image(systemName: "star.fill")
+                                                    .font(.caption2)
+                                                    .foregroundColor(.yellow)
+                                            }
+                                            else{
+                                                Image(systemName: "star")
+                                                    .font(.caption2)
+                                                    .foregroundColor(.yellow)
+                                            }}
+                                    }
                                     
                                     HStack {
                                         Text(String(format: "%.1f",Movie.fields.IMDb_rating/2)).font(Font.title2.bold()).foregroundColor(.white)
@@ -68,15 +70,14 @@ struct HighRated : View {
                                     
                                 }.padding()
                                 
-                            }}}}
-                
-                
+                            }
+                            
+                        }
+                        .buttonStyle(PlainButtonStyle())
+
+                    }
+                }
             }
-            
         }
     }
-    
-    
-    
-
-     
+}
