@@ -133,9 +133,7 @@ struct HeaderImageSection: View {
 
             // Share Button
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    
-                }) {
+                ShareLink(item: shareText()) {
                     Image(systemName: "square.and.arrow.up")
                         .foregroundColor(.yellow)
                 }
@@ -152,6 +150,12 @@ struct HeaderImageSection: View {
             }
         }
     }
+    
+    // Helper function to create share text
+    private func shareText() -> String {
+        return "Check out this movie: \(title)\n\(posterURL)"
+    }
+    
 }
 
 
