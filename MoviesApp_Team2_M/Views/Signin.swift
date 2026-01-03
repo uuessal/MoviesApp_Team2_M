@@ -135,7 +135,7 @@ struct DesignInputField: View {
 struct SigninButton: View {
     var body: some View {
         
-        Button(action:{}){
+        NavigationLink(destination: MoviesCenterView()) {
             Text("Sing in")
                 .font(.headline)
                 .foregroundColor(.black)
@@ -148,7 +148,9 @@ struct SigninButton: View {
 }
         
         
-        #Preview {
-            SigninPage()
-        }
+#Preview {
+    NavigationStack {
+        SigninPage()
+    }
+}
     
