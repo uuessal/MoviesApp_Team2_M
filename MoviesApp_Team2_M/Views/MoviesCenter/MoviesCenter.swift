@@ -11,6 +11,10 @@ import SwiftUI
 
 
 struct MoviesCenterView: View {
+    
+    
+    @StateObject private var viewModel = MoviesCenterViewModel()
+
   
     @State var moviesList: [Movie] = []
 
@@ -30,7 +34,7 @@ struct MoviesCenterView: View {
     var body: some View {
         NavigationStack {
             ScrollView(.vertical){
-            VStack (alignment: .leading ){
+            VStack (alignment: .leading , spacing: 10 ){
                 
                 
 //high rated

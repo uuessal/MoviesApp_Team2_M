@@ -13,10 +13,13 @@ struct HighRated : View {
     
     var body: some View {
         
-        
-        Text("High rated").font(Font.title).bold()
-        ScrollView(.horizontal){
-            HStack (spacing : 30){
+        VStack(alignment: .leading, spacing: 0) { // spacing = 0 لإزالة الفراغ من فوق
+            
+            
+            Text("High rated").font(Font.title).bold()
+            //ScrollView(.horizontal){
+            TabView{
+                //  HStack (spacing : 30){
                 
                 
                 ForEach(moviesList.sorted{ $0.fields.IMDb_rating/2 > $1.fields.IMDb_rating/2} .prefix(5), id: \.id) { Movie in
@@ -74,10 +77,11 @@ struct HighRated : View {
                             
                         }
                         .buttonStyle(PlainButtonStyle())
-
+                        
                     }
                 }
-            }
+                // }
+            }.tabViewStyle(.page(indexDisplayMode: .always)).frame(height: 550)
         }
     }
 }

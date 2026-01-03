@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct AddReviewView: View {
+    
+    let movieId: String
+
 
     @Environment(\.dismiss) var dismiss
     @State private var reviewText: String = ""
@@ -80,6 +83,27 @@ struct AddReviewView: View {
             // Add Button
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
+                    
+                    Task { // async context
+                                do {
+                                    let reviewFields = ReviewFields(
+                                        rate: Double(rating), // rating من النجوم
+                                        review_text: reviewText,
+                                        movie_id: movieId , // ممكن تمررين ID الفلم
+                                        user_id: "recaLvl1OOPjSagCx" // ID المستخدم الحالي
+                                    )
+
+                                    let _ = try await sendReview(reviewFields: reviewFields)
+
+                                    // بعد الإرسال، اغلاق الصفحة
+                                    dismiss()
+
+                                } catch {
+                                    print("Failed to post review:", error)
+                                }
+                            }
+                    
+                    
                 } label: {
                     Image(systemName: "plus")
                         .foregroundColor(.yellow)
@@ -91,6 +115,6 @@ struct AddReviewView: View {
 
 #Preview {
     NavigationStack {
-        AddReviewView()
+        AddReviewView(movieId: "reckJmZ458CZcLlUd")
     }
 }

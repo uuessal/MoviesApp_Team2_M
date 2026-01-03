@@ -5,21 +5,23 @@
 //  Created by wessal hashim alharbi on 30/12/2025.
 //
 
-//
-//  movies.swift
-//  MoviesApp_Team2_M
-//
-//  Created by Lojaen Jehad Ayash on 03/07/1447 AH.
-//
-
 import Foundation
 
-
-func fetchReviewsFromAPI() async throws -> [Review] {
-    let data = try await APIClient.fetch("/reviews?filterByFormula=%7Bmovie_id%7D%3D%22reca1oIIcB4R3HVgw%22")
-    // الفلم ثابت حاليا المفروض نمرر ايدي الفلم هنا
+// MARK: - Fetch Reviews
+func fetchReviewsFromAPI(movieId: String) async throws -> [Review] {
+    
+    let urlString = "/reviews?filterByFormula={movie_id}=\"\(movieId)\""
+    
+    let encodedUrl = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? urlString
+    
+    let data = try await APIClient.fetch(encodedUrl)
     let decoded = try JSONDecoder().decode(ReviewsResponse.self, from: data)
     return decoded.records
 }
 
-
+func sendReview(reviewFields: ReviewFields) async throws -> Review {
+    let body = ReviewRequest(fields: reviewFields)
+    
+    let data = try await APIClient.send("/reviews", body: body)
+    return try JSONDecoder().decode(Review.self, from: data)
+}
