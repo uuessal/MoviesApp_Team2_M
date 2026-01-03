@@ -16,7 +16,11 @@
 import SwiftUI
 
 struct SigninPage: View {
+    
+    let userId: String  // Pass user ID when navigating to this page
+
     var body: some View {
+        
         
         ZStack {
            
@@ -135,7 +139,7 @@ struct DesignInputField: View {
 struct SigninButton: View {
     var body: some View {
         
-        NavigationLink(destination: MoviesCenterView()) {
+        NavigationLink(destination: MoviesCenterView(userId : "recaLvl1OOPjSagCx" )) {
             Text("Sing in")
                 .font(.headline)
                 .foregroundColor(.black)
@@ -150,7 +154,7 @@ struct SigninButton: View {
         
 #Preview {
     NavigationStack {
-        SigninPage()
+        SigninPage(userId: "recaLvl1OOPjSagCx")
     }
 }
     

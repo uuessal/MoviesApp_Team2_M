@@ -10,6 +10,9 @@ import SwiftUI
 // Reviews Section
 struct ReviewsSection: View {
     let ReviewsList : [Review]
+    
+    @StateObject private var viewModel = ReviewViewModel()
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Rating & Reviews")
@@ -38,8 +41,8 @@ struct ReviewsSection: View {
                         ReviewCardView(
                             userName: Review.fields.user_id, // قاعد يطلع الاي دي نحتاج نسوي نيتوركنق لابياي اليوزر عشان نسحب الاسم والصورة :)
                             review: Review.fields.review_text,
-                            rate: Int(Review.fields.rate)
-                            
+                            rate: Int(Review.fields.rate),
+                            ReviewDate: viewModel.simpleDay(from: Review.createdTime)
                         )}
                         
                       
@@ -57,6 +60,7 @@ struct ReviewCardView: View {
     let userName: String
     let review: String
     let rate : Int
+    let ReviewDate : String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -99,7 +103,7 @@ struct ReviewCardView: View {
             // Date
             HStack {
                 Spacer()
-                Text("Tuesday")
+                Text(ReviewDate)
                     .font(.caption)
                     .foregroundColor(.gray)
             }

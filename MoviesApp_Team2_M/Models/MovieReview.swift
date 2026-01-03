@@ -19,6 +19,7 @@ struct ReviewFields: Codable {
 
 struct Review: Codable {
     let id: String
+    let createdTime : String
     let fields: ReviewFields
    
 }

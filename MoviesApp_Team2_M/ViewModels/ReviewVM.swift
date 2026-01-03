@@ -29,4 +29,18 @@ class ReviewViewModel: ObservableObject {
         
         isSending = false
     }
+    
+    
+    func simpleDay(from isoDate: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ" // صيغة تاريخ الـ API
+        
+        if let date = formatter.date(from: isoDate) {
+            formatter.dateFormat = "EEEE"
+            return formatter.string(from: date)
+        } else {
+            return ""
+        }
+    }
+
 }
