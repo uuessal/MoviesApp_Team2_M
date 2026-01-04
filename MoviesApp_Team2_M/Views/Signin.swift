@@ -174,9 +174,12 @@ struct SigninButton: View {
                     .background(Color.yellow)
                     .cornerRadius(8)
             }
+            
+            
+            
 
             NavigationLink(
-                destination: MoviesCenterView(),
+                destination: MoviesCenterView(userId: "recaLvl1OOPjSagCx"),
                 isActive: $navigate
             ) {
                 EmptyView()
@@ -189,6 +192,6 @@ struct SigninButton: View {
 
 #Preview {
     NavigationStack {
-        SigninPage()
+        SigninPage(userId: "recaLvl1OOPjSagCx")
     }
 }
