@@ -10,7 +10,11 @@ import SwiftUI
 struct MoviesCenterView: View {
     
     @StateObject private var viewModel = MoviesCenterViewModel()
-    let userId: String  // Pass user ID when navigating to this page
+    let user: AppUser
+    
+    //testing
+    
+  //  user = AppUser(id: "recPMaNVKM6yYZFIl", fields: UserFields())
     
     @State var moviesList: [Movie] = []
     
@@ -33,12 +37,13 @@ struct MoviesCenterView: View {
                     
                     //high rated
                     if (searchText.isEmpty) {
-                        HighRated(moviesList: moviesList)
+                        HighRated(moviesList: moviesList , user : user)
                         
-                        Genre(moviesList: moviesList)
+                        Genre(moviesList: moviesList , user : user)
+                        
                     }
                     else{
-                        Genre(moviesList: filteredMovies)
+                        Genre(moviesList: filteredMovies , user : user)
                     }
                     
                     Spacer()
@@ -50,8 +55,8 @@ struct MoviesCenterView: View {
                 .searchable(text:$searchText, placement: .navigationBarDrawer, prompt: "Search Movie")
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: Profilepage(userId: userId)) {
-                            AsyncImage(url: URL(string: "https://i.pinimg.com/736x/00/47/00/004700cb81873e839ceaadf9f3c1fb28.jpg")) { image in
+                        NavigationLink(destination: Profilepage(user : user)) {
+                            AsyncImage(url: URL(string: user.fields.profile_image)) { image in
                                 image
                                     .resizable()
                                     .scaledToFill()
@@ -81,5 +86,5 @@ struct MoviesCenterView: View {
 }
 
 #Preview {
-    MoviesCenterView(userId: "recaLvl1OOPjSagCx")
+   // MoviesCenterView(userId: "recaLvl1OOPjSagCx")
 }

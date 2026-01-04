@@ -10,6 +10,8 @@ import SwiftUI
 struct Genre : View {
     
     let moviesList : [Movie]
+    let user : AppUser
+    
     
     var allGenres: [String] {
         Array(Set(moviesList.flatMap { $0.fields.genre }))
@@ -40,7 +42,7 @@ struct Genre : View {
                         
                         if (Movie.fields.genre.contains(genre)){
                             
-                            NavigationLink(destination: MoviesDetailsView(movieId: Movie.id)) {
+                            NavigationLink(destination: MoviesDetailsView(movieId: Movie.id , user : user)) {
                                 AsyncImage(url: URL(string: Movie.fields.poster)) { image in
                                     image
                                         .resizable()

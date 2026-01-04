@@ -14,6 +14,7 @@ class MovieDetailsViewModel: ObservableObject {
     @Published var directors: [Director] = []
     @Published var actors: [Actor] = []
     @Published var reviewsList: [Review] = []
+    @Published var usersList: [AppUser] = []
     @Published var isLoading = true
     @Published var errorMessage: String?
     
@@ -30,6 +31,8 @@ class MovieDetailsViewModel: ObservableObject {
             
             // Fetch reviews
             reviewsList = try await fetchReviewsFromAPI(movieId: movieId)
+            
+            usersList = try await fetchUserFromAPI()
             
             isLoading = false
         } catch {

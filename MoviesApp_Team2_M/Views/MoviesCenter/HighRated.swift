@@ -11,6 +11,8 @@ struct HighRated : View {
     
     let moviesList : [Movie]
     
+    let user : AppUser
+    
     var body: some View {
         
         VStack(alignment: .leading, spacing: 0) { // spacing = 0 لإزالة الفراغ من فوق
@@ -24,7 +26,7 @@ struct HighRated : View {
                 
                 ForEach(moviesList.sorted{ $0.fields.IMDb_rating/2 > $1.fields.IMDb_rating/2} .prefix(5), id: \.id) { Movie in
                     if (Movie.fields.IMDb_rating>=4.0){
-                        NavigationLink(destination: MoviesDetailsView(movieId: Movie.id)) {
+                        NavigationLink(destination: MoviesDetailsView(movieId: Movie.id , user : user)) {
                             ZStack (alignment: .bottomLeading) {
                                 AsyncImage(url: URL(string: Movie.fields.poster)) { image in
                                     image

@@ -13,6 +13,8 @@ struct MoviesDetailsView: View {
     @StateObject private var viewModel = MovieDetailsViewModel()
     let movieId: String
     
+    let user : AppUser
+    
     var body: some View {
         ScrollView {
             if viewModel.isLoading {
@@ -41,9 +43,9 @@ struct MoviesDetailsView: View {
 
                     CastSection(actors: viewModel.actors)
 
-                    ReviewsSection(ReviewsList: viewModel.reviewsList)
+                    ReviewsSection(ReviewsList: viewModel.reviewsList , userList: viewModel.usersList , rating : movie.fields.IMDb_rating)
                     
-                    WriteReviewButton(movieId: movieId)
+                    WriteReviewButton(movieId: movieId , user : user)
                 }
                 .padding(.bottom, 32)
             } else if let errorMessage = viewModel.errorMessage {
@@ -392,9 +394,12 @@ struct CastItemView: View {
 struct WriteReviewButton: View {
     
     let movieId: String
+    
+    let user : AppUser
+
     var body: some View {
         NavigationLink {
-           AddReviewView(movieId: movieId)
+            AddReviewView(movieId: movieId , user : user)
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: "square.and.pencil")
@@ -421,6 +426,6 @@ struct WriteReviewButton: View {
 // Preview
 #Preview {
     NavigationStack {
-        MoviesDetailsView(movieId: "reckJmZ458CZcLlUd")
+     //   MoviesDetailsView(movieId: "reckJmZ458CZcLlUd")
     }
 }

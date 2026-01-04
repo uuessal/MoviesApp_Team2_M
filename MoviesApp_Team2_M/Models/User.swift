@@ -8,7 +8,7 @@ import Foundation
 
 struct UserFields: Codable {
     let name: String
-    let password: String
+    let password: String?
     let email: String
     let profile_image: String
     

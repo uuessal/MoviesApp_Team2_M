@@ -164,11 +164,13 @@ struct SigninButton: View {
             }
 
             // Navigate to MoviesCenterView with the logged-in user's ID
-            NavigationLink(
-                destination: MoviesCenterView(userId: viewModel.user?.id ?? ""),
-                isActive: $navigate
-            ) {
-                EmptyView()
+            if let user = viewModel.user {
+                NavigationLink(
+                    destination: MoviesCenterView(user: user),
+                    isActive: $navigate
+                ) {
+                    EmptyView()
+                }
             }
         }
     }

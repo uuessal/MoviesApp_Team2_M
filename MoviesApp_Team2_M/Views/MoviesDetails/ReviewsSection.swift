@@ -10,8 +10,16 @@ import SwiftUI
 // Reviews Section
 struct ReviewsSection: View {
     let ReviewsList : [Review]
+    let userList : [AppUser]
+    let rating: Double
+
     
     @StateObject private var viewModel = ReviewViewModel()
+    
+    var usersById: [String: AppUser] {
+        Dictionary(uniqueKeysWithValues: userList.map { ($0.id, $0) })
+    }
+
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -21,7 +29,7 @@ struct ReviewsSection: View {
             
             
             VStack(alignment: .leading, spacing: 2) {
-                Text("4.8")
+                Text(String(rating/2))
                     .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
@@ -34,16 +42,18 @@ struct ReviewsSection: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    
+                 
                     
                     ForEach(ReviewsList , id: \.id) { Review in
                         
-                        ReviewCardView(
-                            userName: Review.fields.user_id, // قاعد يطلع الاي دي نحتاج نسوي نيتوركنق لابياي اليوزر عشان نسحب الاسم والصورة :)
-                            review: Review.fields.review_text,
-                            rate: Int(Review.fields.rate),
-                            ReviewDate: viewModel.simpleDay(from: Review.createdTime)
-                        )}
+                        let UserNameById = usersById[Review.fields.user_id]?.fields.name ?? "Unknown User"
+
+                            ReviewCardView(
+                                userName: UserNameById, // قاعد يطلع الاي دي نحتاج نسوي نيتوركنق لابياي اليوزر عشان نسحب الاسم والصورة :)
+                                review: Review.fields.review_text,
+                                rate: Int(Review.fields.rate),
+                                ReviewDate: viewModel.simpleDay(from: Review.createdTime)
+                            )}
                         
                       
                     }

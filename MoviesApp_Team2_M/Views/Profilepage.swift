@@ -9,8 +9,8 @@ import SwiftUI
 
 struct Profilepage: View {
     @StateObject private var viewModel = ProfileViewModel()
-    let userId: String  // Pass user ID when navigating to this page
-    
+    let user: AppUser
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -48,7 +48,7 @@ struct Profilepage: View {
                             GridItem(.flexible())
                         ], spacing: 16) {
                             ForEach(viewModel.savedMovies, id: \.id) { movie in
-                                NavigationLink(destination: MoviesDetailsView(movieId: movie.id)) {
+                                NavigationLink(destination: MoviesDetailsView(movieId: movie.id , user : user)) {
                                     AsyncImage(url: URL(string: movie.fields.poster)) { image in
                                         image
                                             .resizable()
@@ -80,7 +80,7 @@ struct Profilepage: View {
             .navigationTitle("Profile")
             .preferredColorScheme(.dark)
             .task {
-                await viewModel.loadData(userId: userId)
+                await viewModel.loadData(userId: user.id)
             }
         }
     }
@@ -133,6 +133,6 @@ struct ProfileButton: View {
 }
 
 #Preview {
-    Profilepage(userId: "recaLvl1OOPjSagCx")
+   // Profilepage(user : user)
 }
 	

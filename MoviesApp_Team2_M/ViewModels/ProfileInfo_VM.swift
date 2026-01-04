@@ -28,7 +28,7 @@ class ProfileInfoViewModel: ObservableObject {
     }
     
     func saveChanges() async {
-        print("💾 Step 1: Starting to save changes...")
+        print("Step 1: Starting to save changes...")
         isLoading = true
         errorMessage = nil
         successMessage = nil
@@ -36,31 +36,31 @@ class ProfileInfoViewModel: ObservableObject {
         // Combine first and last name
         let fullName = "\(firstName) \(lastName)".trimmingCharacters(in: .whitespaces)
         
-        print("💾 Step 2: Preparing data...")
+        print("Step 2: Preparing data...")
         print("   User ID: \(user.id)")
         print("   Full Name: \(fullName)")
         print("   Email: \(user.fields.email)")
-        print("   Password: \(user.fields.password)")
+        print("   Password: \(user.fields.password ?? "nil")")
         print("   Profile Image: \(user.fields.profile_image)")
         
         do {
-            print("💾 Step 3: Calling API...")
+            print("Step 3: Calling API...")
             
             let updatedUser = try await updateUserFromAPI(
                 userId: user.id,
                 name: fullName,
                 email: user.fields.email,
-                password: user.fields.password,
+                password: user.fields.password ?? "",  // Unwrap with default empty string
                 profileImage: user.fields.profile_image
             )
             
-            print("✅ Step 4: Save successful!")
+            print("Step 4: Save successful!")
             self.user = updatedUser
             successMessage = "Profile updated successfully"
             isLoading = false
             
         } catch {
-            print("❌ Step 4: Save failed!")
+            print("Step 5: Save failed!")
             print("   Error: \(error)")
             errorMessage = "Failed to update profile"
             isLoading = false

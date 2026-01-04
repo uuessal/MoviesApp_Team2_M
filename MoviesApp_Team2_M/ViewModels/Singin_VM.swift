@@ -37,7 +37,7 @@ class SigninViewModel: ObservableObject {
             
             // Print all users for debugging
             for (index, user) in users.enumerated() {
-                print("User \(index + 1): \(user.fields.email) / \(user.fields.password)")
+                print("   User \(index + 1): \(user.fields.email) / \(user.fields.password ?? "NO PASSWORD")")
             }
             
             print("Step 4: Searching for match...")
@@ -46,7 +46,7 @@ class SigninViewModel: ObservableObject {
 
             if let matchedUser = users.first(where: {
                 $0.fields.email.lowercased() == email.lowercased() &&
-                $0.fields.password == password
+                $0.fields.password == password  // This will only match if password exists and matches
             }) {
                 print("Step 5: Login successful!")
                 print("   User ID: \(matchedUser.id)")

@@ -24,7 +24,7 @@ func fetchUserDetailsFromAPI(userId: String) async throws -> AppUser {
 
 
 // Update user information
-func updateUserFromAPI(userId: String, name: String, email: String, password: String, profileImage: String) async throws -> AppUser {
+func updateUserFromAPI(userId: String, name: String, email: String, password: String?, profileImage: String) async throws -> AppUser {
     
     // Create the request body structure
     struct UpdateUserBody: Encodable {
@@ -33,18 +33,18 @@ func updateUserFromAPI(userId: String, name: String, email: String, password: St
     
     let body = UpdateUserBody(fields: UserFields(
         name: name,
-        password: password,
+        password: password,  // Keep it optional
         email: email,
         profile_image: profileImage
     ))
     
-    print("ending PUT request to /users/\(userId)")
-    print("Body: name=\(name), email=\(email)")
+    print("📡 Sending PUT request to /users/\(userId)")
+    print("   Body: name=\(name), email=\(email)")
     
     // Send PUT request
     let data = try await APIClient.put("/users/\(userId)", body: body)
     let decoded = try JSONDecoder().decode(AppUser.self, from: data)
     
-    print("User updated successfully!")
+    print("✅ User updated successfully!")
     return decoded
 }
