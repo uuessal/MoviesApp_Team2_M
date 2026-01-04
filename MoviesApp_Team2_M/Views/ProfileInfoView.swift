@@ -3,21 +3,47 @@
 //  MoviesApp_Team2_M
 //
 //  Created by Shahd Muharrq on 10/07/1447 AH.
+//
 
 import SwiftUI
 
 struct ProfileInfoView: View {
-    let user: AppUser  // Accept user data
-    
+    @StateObject private var viewModel: ProfileInfoViewModel
     @State private var isEditing = false
+    
+    init(user: AppUser) {
+        _viewModel = StateObject(wrappedValue: ProfileInfoViewModel(user: user))
+    }
     
     var body: some View {
         VStack(spacing: 20) {
             
-            profileImage(isEditing: $isEditing, imageURL: user.fields.profile_image)
+            profileImage(isEditing: $isEditing, imageURL: viewModel.user.fields.profile_image)
             
             // Card
-            infoCard(isEditing: $isEditing, user: user)
+            infoCard(
+                isEditing: $isEditing,
+                firstName: $viewModel.firstName,
+                lastName: $viewModel.lastName,
+                email: viewModel.user.fields.email
+            )
+            
+            // Show success/error messages
+            if let successMessage = viewModel.successMessage {
+                Text(successMessage)
+                    .foregroundColor(.green)
+                    .font(.caption)
+                    .padding(.top, 8)
+            }
+            
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .font(.caption)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+            }
             
             Spacer()
             
@@ -37,15 +63,27 @@ struct ProfileInfoView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
                     if isEditing {
-                        // SAVE action - call your API here
-                        isEditing = false
+                        // SAVE action
+                        Task {
+                            await viewModel.saveChanges()
+                            if viewModel.errorMessage == nil {
+                                isEditing = false
+                            }
+                        }
                     } else {
                         isEditing = true
                     }
                 } label: {
-                    Text(isEditing ? "Save" : "Edit")
-                        .foregroundStyle(.yellow)
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .yellow))
+                            .scaleEffect(0.8)
+                    } else {
+                        Text(isEditing ? "Save" : "Edit")
+                            .foregroundStyle(.yellow)
+                    }
                 }
+                .disabled(viewModel.isLoading)
             }
         }
     }
@@ -65,7 +103,7 @@ struct profileImage: View {
                     .clipShape(Circle())
             } placeholder: {
                 Circle()
-                    .fill(Color.gray.opacity(0.4))
+                    .fill(Color.gray.opacity(0.25))
                     .frame(width: 90, height: 90)
                     .overlay(
                         Image(systemName: "person.fill")
@@ -88,14 +126,11 @@ struct profileImage: View {
     }
 }
 
-
 struct infoCard: View {
     @Binding var isEditing: Bool
-    let user: AppUser
-    
-    // Split the name into first and last name
-    @State private var firstName = ""
-    @State private var lastName = ""
+    @Binding var firstName: String
+    @Binding var lastName: String
+    let email: String
     
     var body: some View {
         VStack(spacing: 0) {
@@ -107,12 +142,11 @@ struct infoCard: View {
             
             Divider().background(Color.white.opacity(0.1))
             
-            // Email (read-only)
             HStack {
                 Text("Email")
                     .foregroundStyle(.white.opacity(0.85))
                 Spacer()
-                Text(user.fields.email)
+                Text(email)
                     .foregroundStyle(.white.opacity(0.6))
             }
             .padding(.horizontal, 16)
@@ -121,12 +155,6 @@ struct infoCard: View {
         .background(Color.white.opacity(0.08))
         .cornerRadius(10)
         .padding(.horizontal, 16)
-        .onAppear {
-            // Split name into first and last
-            let nameParts = user.fields.name.split(separator: " ")
-            firstName = String(nameParts.first ?? "")
-            lastName = nameParts.count > 1 ? String(nameParts.last ?? "") : ""
-        }
     }
 }
 
@@ -179,12 +207,12 @@ struct signoutBtn : View {
 #Preview {
     NavigationStack {
         ProfileInfoView(user: AppUser(
-            id: "recaLvl1OOPjSagCx",
+            id: "recmkWslbkyjQly3f",
             fields: UserFields(
-                name: "Sarah Abdullah",
-                password: "password",
-                email: "sarah@example.com",
-                profile_image: "https://source.unsplash.com/200x200/?person"
+                name: "Wafaa Ahmad",
+                password: "Wafaa@gmail.com",
+                email: "Wafaa@gmail.com",
+                profile_image: "https://i.pinimg.com/736x/0d/50/63/0d5063654b6e1a1bbbe4e637061b15ce.jpg"
             )
         ))
     }
