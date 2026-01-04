@@ -43,7 +43,7 @@ struct MoviesDetailsView: View {
 
                     ReviewsSection(ReviewsList: viewModel.reviewsList)
                     
-                    WriteReviewButton()
+                    WriteReviewButton(movieId: movieId)
                 }
                 .padding(.bottom, 32)
             } else if let errorMessage = viewModel.errorMessage {
@@ -387,69 +387,14 @@ struct CastItemView: View {
 // حطيته بملف لحال
 
 
-struct ReviewCardView: View {
-    let userName: String
-    let review: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-
-            // Header (Avatar + Name + Stars)
-            HStack(alignment: .top, spacing: 12) {
-                // Avatar
-                Circle()
-                    .fill(Color.gray.opacity(0.4))
-                    .frame(width: 44, height: 44)
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(userName)
-                        .font(.body)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-
-                    HStack(spacing: 4) {
-                        ForEach(0..<3) { _ in
-                            Image(systemName: "star.fill")
-                                .font(.caption)
-                                .foregroundColor(.yellow)
-                        }
-                        ForEach(0..<2) { _ in
-                            Image(systemName: "star")
-                                .font(.caption)
-                                .foregroundColor(.yellow)
-                        }
-                    }
-                }
-            }
-
-            // Review text
-            Text(review)
-                .font(.body)
-                .foregroundColor(.white)
-                .fixedSize(horizontal: false, vertical: true)
-
-            // Date
-            HStack {
-                Spacer()
-                Text("Tuesday")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
-        }
-        .padding(16)
-        .frame(width: 300)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color.white.opacity(0.08))
-        )
-    }
-}
 
 // Review Button
 struct WriteReviewButton: View {
+    
+    let movieId: String
     var body: some View {
         NavigationLink {
-           AddReviewView()
+           AddReviewView(movieId: movieId)
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: "square.and.pencil")

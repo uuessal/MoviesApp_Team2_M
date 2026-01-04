@@ -16,7 +16,11 @@
 import SwiftUI
 
 struct SigninPage: View {
+    
+    let userId: String  // Pass user ID when navigating to this page
+
     var body: some View {
+        
         
         ZStack {
             

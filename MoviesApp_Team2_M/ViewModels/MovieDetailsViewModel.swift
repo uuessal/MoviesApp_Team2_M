@@ -29,7 +29,7 @@ class MovieDetailsViewModel: ObservableObject {
             actors = try await fetchActorsForMovie(movieId: movieId)
             
             // Fetch reviews
-            reviewsList = try await fetchReviewsFromAPI()
+            reviewsList = try await fetchReviewsFromAPI(movieId: movieId)
             
             isLoading = false
         } catch {

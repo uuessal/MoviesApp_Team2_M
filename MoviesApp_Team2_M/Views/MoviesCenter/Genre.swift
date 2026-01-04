@@ -33,7 +33,7 @@ struct Genre : View {
             
                         
             ScrollView(.horizontal){
-                HStack{
+                HStack(spacing : 10){
                     
                     
                     ForEach(moviesList , id: \.id) { Movie in

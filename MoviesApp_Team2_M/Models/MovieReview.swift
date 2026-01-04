@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ReviewFields: Decodable {
+struct ReviewFields: Codable {
   
     let rate : Double
     let review_text : String
@@ -17,8 +17,9 @@ struct ReviewFields: Decodable {
 }
 
 
-struct Review: Decodable {
+struct Review: Codable {
     let id: String
+    let createdTime : String
     let fields: ReviewFields
    
 }
@@ -26,4 +27,8 @@ struct Review: Decodable {
 
 struct ReviewsResponse: Decodable {
 let records: [Review]
+}
+
+struct ReviewRequest: Encodable {
+    let fields: ReviewFields
 }

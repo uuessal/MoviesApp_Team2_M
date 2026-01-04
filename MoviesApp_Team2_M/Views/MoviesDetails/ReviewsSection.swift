@@ -10,6 +10,9 @@ import SwiftUI
 // Reviews Section
 struct ReviewsSection: View {
     let ReviewsList : [Review]
+    
+    @StateObject private var viewModel = ReviewViewModel()
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Rating & Reviews")
@@ -37,7 +40,9 @@ struct ReviewsSection: View {
                         
                         ReviewCardView(
                             userName: Review.fields.user_id, // قاعد يطلع الاي دي نحتاج نسوي نيتوركنق لابياي اليوزر عشان نسحب الاسم والصورة :)
-                            review: Review.fields.review_text
+                            review: Review.fields.review_text,
+                            rate: Int(Review.fields.rate),
+                            ReviewDate: viewModel.simpleDay(from: Review.createdTime)
                         )}
                         
                       
@@ -45,5 +50,69 @@ struct ReviewsSection: View {
             }
         }
         .padding(.horizontal)
+    }
+}
+
+
+
+
+struct ReviewCardView: View {
+    let userName: String
+    let review: String
+    let rate : Int
+    let ReviewDate : String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+
+            // Header (Avatar + Name + Stars)
+            HStack(alignment: .top, spacing: 12) {
+                // Avatar
+                Circle()
+                    .fill(Color.gray.opacity(0.4))
+                    .frame(width: 44, height: 44)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(userName)
+                        .font(.body)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+
+                    HStack(spacing: 4) {
+                        ForEach(0..<5) { star in
+                            if(star < rate){
+                                Image(systemName: "star.fill")
+                                    .font(.caption2)
+                                    .foregroundColor(.yellow)
+                            }
+                            else{
+                                Image(systemName: "star")
+                                    .font(.caption2)
+                                    .foregroundColor(.yellow)
+                            }}
+                    }
+                }
+            }
+
+            // Review text
+            Text(review)
+                .font(.body)
+                .foregroundColor(.white)
+                .fixedSize(horizontal: false, vertical: true)
+
+            // Date
+            HStack {
+                Spacer()
+                Text(ReviewDate)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding(16)
+        .frame(width: 300)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white.opacity(0.08))
+        )
     }
 }

@@ -52,23 +52,31 @@ struct APIClient {
     }
     
     
-    
-    static func post(_ endpoint: String) async throws -> Data {
+    static func send <T: Encodable> (_ endpoint: String,body: T) async throws -> Data {
+        
+        // T is Generics(باختصار تعريف مرن يقبل اي نوع داتا عشان نقدر نستخدمه للرفيو والسيفد موفي)
+
         guard let url = URL(string: baseURL + endpoint) else {
             throw URLError(.badURL)
         }
 
         var request = URLRequest(url: url)
-        
         request.httpMethod = "POST"
-        request.setValue("Bearer \(APIKey.airtable)",forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(APIKey.airtable)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
+        request.httpBody = try JSONEncoder().encode(body)
 
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let httpResponse = response as? HTTPURLResponse,
+           !(200...299).contains(httpResponse.statusCode) {
+            throw URLError(.badServerResponse)
+        }
+
         return data
     }
-    
+
     
     static func put(_ endpoint: String) async throws -> Data {
         guard let url = URL(string: baseURL + endpoint) else {

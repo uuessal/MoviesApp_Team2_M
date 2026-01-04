@@ -11,7 +11,7 @@ import SwiftUI
 struct MoviesApp_Team2_MApp: App {
     var body: some Scene {
         WindowGroup {
-            SigninPage()
+            MoviesCenterView(userId: "recaLvl1OOPjSagCx").preferredColorScheme(.dark)
         }
     }
 }
