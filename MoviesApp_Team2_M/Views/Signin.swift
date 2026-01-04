@@ -19,7 +19,7 @@ struct SigninPage: View {
     var body: some View {
         
         ZStack {
-           
+            
             Image("Sinbackground")
                 .resizable()
                 .ignoresSafeArea()
@@ -37,47 +37,54 @@ struct SigninPage: View {
 
 
 struct InputField: View {
+    @StateObject private var viewModel = SigninViewModel()
     var body: some View{
         VStack (alignment: .leading)
-    {
+        {
             Spacer()
             
             Text("Sing in")
                 .font(.largeTitle.bold())
                 .foregroundStyle(Color.white)
-        Spacer().frame(height: 8)
-        Text("You'll find what you're looking for in the ocean of movies")
-            .foregroundStyle(Color.white)
-            .font(
+            Spacer().frame(height: 8)
+            Text("You'll find what you're looking for in the ocean of movies")
+                .foregroundStyle(Color.white)
+                .font(
                     .system(
                         size: 18,
                         weight: .medium,
                         design: .default
                     )
-                    )
-        Spacer().frame(height: 41)
-        VStack (spacing:20){
-            
-             DesignInputField(
-                title: "Email",
-                placeholder: "youremail@gmail.com",
-                isSecure: true,
+                )
+            Spacer().frame(height: 41)
+            VStack (spacing:20){
                 
-            )
-            
-            DesignInputField(
-                title: "Password",
-                placeholder: "4444",
-                isSecure: true,
+                DesignInputField(
+                    title: "Email",
+                    placeholder: "youremail@gmail.com",
+                    text: $viewModel.email,
+                    isSecure: false
+                )
                 
-            )
+                DesignInputField(
+                    title: "Password",
+                    placeholder: "1234567@@",
+                    text: $viewModel.password,
+                    isSecure: true
+                )
+                
+            }
             
-        }
-        Spacer().frame(height: 41)
-        SigninButton()
-        }
-       
-
+            
+            if let error = viewModel.errorMessage {
+                           Text(error)
+                               .foregroundColor(.red)
+                       }
+            Spacer().frame(height: 41)
+            SigninButton(viewModel: viewModel)
+                  }
+        
+        
     }
 }
 
@@ -86,7 +93,11 @@ struct DesignInputField: View {
     let title: String
     /*انا هنا ضفت اللت في الكود عشان الديزاين الي فوق يستقبل معلومات  ويشتغل  */
     let placeholder: String
+    @Binding var text: String
     let isSecure: Bool
+    //اضفت هذا الستيت عشان العين الي جنب الباسورد يقدر يتحكم فيها اليوزر ، اغيرها في الاف ستيتنت
+    @State private var showPassword = false
+
     var body: some View {
         VStack(alignment:.leading){
             Text(title)
@@ -97,10 +108,10 @@ struct DesignInputField: View {
             ZStack(alignment: .trailing){
                 
                 Group{
-                    if isSecure {
-                        SecureField("", text: .constant(placeholder))
+                    if isSecure && !showPassword  {
+                        SecureField("", text: $text, prompt: Text(placeholder).foregroundColor(.gray))
                     } else {
-                        TextField("", text: .constant(placeholder))
+                        TextField("", text: $text, prompt: Text(placeholder).foregroundColor(.gray))
                         
                     }
                 }
@@ -110,47 +121,70 @@ struct DesignInputField: View {
                 .cornerRadius(8)
                 .foregroundColor(.white)
                 .accentColor(.yellow)
-               
+                
                 
                 if isSecure {
-                  Image(systemName: "eye.slash")
-                        .foregroundColor(.gray)
-                        .padding(.trailing, 12)
+                    //تكمله عشان يخلي العين يقدر يتحكم فيها اليوزر
                     
+                    Button(action: {
+                        showPassword.toggle()
+                    }) {
+                        
+                        Image(systemName: showPassword ? "eye" : "eye.slash")
+                            .foregroundColor(.gray)
+                            .padding(.trailing, 12)
+                        
+                    }
                 }
             }
             
             
             
-            
         }
         
     }
     
     
-            }
-            
-            
-        
+}
+
+
+
 struct SigninButton: View {
+    @ObservedObject var viewModel: SigninViewModel
+    @State private var navigate = false
+
     var body: some View {
-        
-        NavigationLink(destination: MoviesCenterView()) {
-            Text("Sing in")
-                .font(.headline)
-                .foregroundColor(.black)
-                .frame(width: 358, height: 44)
-                .background(Color.yellow)
-                .cornerRadius(8)
-            
+        VStack {
+            Button {
+                Task {
+                    await viewModel.signIn()
+                    if viewModel.user != nil {
+                        navigate = true
+                    }
+                }
+            } label: {
+                Text("Sign in")
+                    .font(.headline)
+                    .foregroundColor(.black)
+                    .frame(width: 358, height: 44)
+                    .background(Color.yellow)
+                    .cornerRadius(8)
+            }
+
+            NavigationLink(
+                destination: MoviesCenterView(),
+                isActive: $navigate
+            ) {
+                EmptyView()
+            }
         }
     }
 }
-        
-        
+
+
+
 #Preview {
     NavigationStack {
         SigninPage()
     }
 }
-    

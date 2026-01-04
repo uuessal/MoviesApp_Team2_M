@@ -23,8 +23,32 @@ struct APIClient {
             forHTTPHeaderField: "Authorization"
         )
 
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+//        guard let url = components.url else {
+//                    throw NetworkError.invalidURL
+//                }
+//
+//                let (data, response) = try await URLSession.shared.data(from: url)
+//
+//                guard let httpResponse = response as? HTTPURLResponse else {
+//                    throw NetworkError.invalidResponse
+//                }
+//
+//                guard (200...299).contains(httpResponse.statusCode) else {
+//                    throw NetworkError.serverError(statusCode: httpResponse.statusCode)
+//                }
+//
+//                do {
+//                    return try JSONDecoder().decode([User].self, from: data)
+//                } catch {
+//                    throw NetworkError.decodingFailed
+//                }
+        
+    
         return data
+        
+        
     }
     
     
@@ -37,6 +61,23 @@ struct APIClient {
         var request = URLRequest(url: url)
         
         request.httpMethod = "POST"
+        request.setValue("Bearer \(APIKey.airtable)",forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+
+        let (data, _) = try await URLSession.shared.data(for: request)
+        return data
+    }
+    
+    
+    static func put(_ endpoint: String) async throws -> Data {
+        guard let url = URL(string: baseURL + endpoint) else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        
+        request.httpMethod = "PUT"
         request.setValue("Bearer \(APIKey.airtable)",forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 

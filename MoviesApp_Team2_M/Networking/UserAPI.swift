@@ -16,6 +16,7 @@ func fetchUserFromAPI() async throws -> [AppUser] {
 
 func fetchUserDetailsFromAPI(userId: String) async throws -> AppUser {
     let data = try await APIClient.fetch("/users/\(userId)")
+    //
     let decoded = try JSONDecoder().decode(AppUser.self, from: data)
     return decoded
 }
