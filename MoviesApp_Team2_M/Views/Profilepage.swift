@@ -78,12 +78,6 @@ struct Profilepage: View {
                 .padding(.top, 20)
             }
             .navigationTitle("Profile")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.yellow)
-                }
-            }
             .preferredColorScheme(.dark)
             .task {
                 await viewModel.loadData(userId: userId)
@@ -96,7 +90,7 @@ struct ProfileButton: View {
     let user: AppUser
     
     var body: some View {
-        Button(action: {}) {
+        NavigationLink(destination: ProfileInfoView(user: user)) {
             HStack(spacing: 12) {
                 AsyncImage(url: URL(string: user.fields.profile_image)) { image in
                     image
@@ -130,11 +124,11 @@ struct ProfileButton: View {
                     .foregroundColor(.gray)
             }
         }
+        .buttonStyle(PlainButtonStyle())
         .frame(width: 358, height: 80)
         .padding(.horizontal, 16)
         .background(Color.gray.opacity(0.26))
         .cornerRadius(8)
-        .buttonStyle(.plain)
     }
 }
 

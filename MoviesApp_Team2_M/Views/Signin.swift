@@ -5,20 +5,9 @@
 //  Created by Shahd Muharrq on 07/07/1447 AH.
 //
 
-
-//
-//  ContentView.swift
-//  sing in
-//
-//  Created by Shahd Muharrq on 04/07/1447 AH.
-//
-
 import SwiftUI
 
 struct SigninPage: View {
-    
-    let userId: String  // Pass user ID when navigating to this page
-
     var body: some View {
         
         
@@ -35,8 +24,6 @@ struct SigninPage: View {
             InputField()
         }
     }
-    
-    
 }
 
 
@@ -86,20 +73,21 @@ struct InputField: View {
                        }
             Spacer().frame(height: 41)
             SigninButton(viewModel: viewModel)
-                  }
-        
-        
+            
+        }
     }
 }
 
 
 struct DesignInputField: View {
     let title: String
-    /*انا هنا ضفت اللت في الكود عشان الديزاين الي فوق يستقبل معلومات  ويشتغل  */
+    
     let placeholder: String
+    
     @Binding var text: String
+    
     let isSecure: Bool
-    //اضفت هذا الستيت عشان العين الي جنب الباسورد يقدر يتحكم فيها اليوزر ، اغيرها في الاف ستيتنت
+    
     @State private var showPassword = false
 
     var body: some View {
@@ -128,7 +116,6 @@ struct DesignInputField: View {
                 
                 
                 if isSecure {
-                    //تكمله عشان يخلي العين يقدر يتحكم فيها اليوزر
                     
                     Button(action: {
                         showPassword.toggle()
@@ -141,9 +128,7 @@ struct DesignInputField: View {
                     }
                 }
             }
-            
-            
-            
+                        
         }
         
     }
@@ -163,7 +148,10 @@ struct SigninButton: View {
                 Task {
                     await viewModel.signIn()
                     if viewModel.user != nil {
+                        print("✅ Navigation triggered - User: \(viewModel.user?.fields.name ?? "Unknown")")
                         navigate = true
+                    } else {
+                        print("❌ Navigation blocked - No user logged in")
                     }
                 }
             } label: {
@@ -174,12 +162,10 @@ struct SigninButton: View {
                     .background(Color.yellow)
                     .cornerRadius(8)
             }
-            
-            
-            
 
+            // Navigate to MoviesCenterView with the logged-in user's ID
             NavigationLink(
-                destination: MoviesCenterView(userId: "recaLvl1OOPjSagCx"),
+                destination: MoviesCenterView(userId: viewModel.user?.id ?? ""),
                 isActive: $navigate
             ) {
                 EmptyView()
@@ -191,7 +177,5 @@ struct SigninButton: View {
 
 
 #Preview {
-    NavigationStack {
-        SigninPage(userId: "recaLvl1OOPjSagCx")
-    }
+    SigninPage()
 }

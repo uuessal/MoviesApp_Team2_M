@@ -24,28 +24,6 @@ struct APIClient {
         )
 
         let (data, response) = try await URLSession.shared.data(for: request)
-        
-//        guard let url = components.url else {
-//                    throw NetworkError.invalidURL
-//                }
-//
-//                let (data, response) = try await URLSession.shared.data(from: url)
-//
-//                guard let httpResponse = response as? HTTPURLResponse else {
-//                    throw NetworkError.invalidResponse
-//                }
-//
-//                guard (200...299).contains(httpResponse.statusCode) else {
-//                    throw NetworkError.serverError(statusCode: httpResponse.statusCode)
-//                }
-//
-//                do {
-//                    return try JSONDecoder().decode([User].self, from: data)
-//                } catch {
-//                    throw NetworkError.decodingFailed
-//                }
-        
-    
         return data
         
         
@@ -53,9 +31,6 @@ struct APIClient {
     
     
     static func send <T: Encodable> (_ endpoint: String,body: T) async throws -> Data {
-        
-        // T is Generics(باختصار تعريف مرن يقبل اي نوع داتا عشان نقدر نستخدمه للرفيو والسيفد موفي)
-
         guard let url = URL(string: baseURL + endpoint) else {
             throw URLError(.badURL)
         }
@@ -93,8 +68,5 @@ struct APIClient {
         let (data, _) = try await URLSession.shared.data(for: request)
         return data
     }
-    
-    
-    
     
 }

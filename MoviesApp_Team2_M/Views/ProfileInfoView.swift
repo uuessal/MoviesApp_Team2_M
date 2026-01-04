@@ -7,90 +7,71 @@
 import SwiftUI
 
 struct ProfileInfoView: View {
-    // Toggles between "view" and "edit" states
+    let user: AppUser  // Accept user data
+    
     @State private var isEditing = false
     
-    
     var body: some View {
-        
-        NavigationStack {
-                
-                VStack(spacing: 20) {
-                    
-                    profileImage(isEditing: $isEditing)
-                    
-                    
-                    // Card
-                    infoCard(isEditing: $isEditing)
-                    
-                    Spacer()
-                    
-                    // Sign Out only in view mode
-                    signoutBtn(isEditing: $isEditing)
-                }
+        VStack(spacing: 20) {
             
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.black, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            profileImage(isEditing: $isEditing, imageURL: user.fields.profile_image)
             
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        // If editing, behave like "Cancel" (or pop if you want)
-                        if isEditing {
-                            isEditing = false
-                        } else {
-                            // dismiss / pop
-                        }
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "chevron.left")
-                        }
+            // Card
+            infoCard(isEditing: $isEditing, user: user)
+            
+            Spacer()
+            
+            // Sign Out only in view mode
+            signoutBtn(isEditing: $isEditing)
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Color.black, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(isEditing ? "Edit profile" : "Profile info")
+                    .foregroundStyle(.white)
+                    .font(.headline)
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    if isEditing {
+                        // SAVE action - call your API here
+                        isEditing = false
+                    } else {
+                        isEditing = true
+                    }
+                } label: {
+                    Text(isEditing ? "Save" : "Edit")
                         .foregroundStyle(.yellow)
-                    }
-                }
-                
-                ToolbarItem(placement: .principal) {
-                    //if statment short ver
-                    Text(isEditing ? "Edit profile" : "Profile info")
-                        .foregroundStyle(.white)
-                        .font(.headline)
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        if isEditing {
-                            // SAVE action
-                            // call your VM/API here
-                            isEditing = false
-                        } else {
-                            isEditing = true
-                        }
-                    } label: {
-                        Text(isEditing ? "Save" : "Edit")
-                            .foregroundStyle(.yellow)
-                    }
                 }
             }
         }
     }
-    
-    
 }
 
 struct profileImage: View {
     @Binding var isEditing: Bool
+    let imageURL: String
     
     var body: some View {
         ZStack {
-            Circle()
-                .fill(Color.gray.opacity(0.25))
-                .frame(width: 90, height: 90)
-            
-            Image("ProfileIcon")
-                .resizable()
-                .frame(width: 88, height: 88)
-                .foregroundStyle(.white.opacity(0.8))
+            AsyncImage(url: URL(string: imageURL)) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 90, height: 90)
+                    .clipShape(Circle())
+            } placeholder: {
+                Circle()
+                    .fill(Color.gray.opacity(0.4))
+                    .frame(width: 90, height: 90)
+                    .overlay(
+                        Image(systemName: "person.fill")
+                            .foregroundColor(.gray)
+                    )
+            }
             
             if isEditing {
                 Circle()
@@ -110,26 +91,43 @@ struct profileImage: View {
 
 struct infoCard: View {
     @Binding var isEditing: Bool
+    let user: AppUser
     
-    // Profile fields (use your real model / VM later)
-    @State private var firstName = "Sarah"
-    @State private var lastName  = "Abdullah"
+    // Split the name into first and last name
+    @State private var firstName = ""
+    @State private var lastName = ""
+    
     var body: some View {
         VStack(spacing: 0) {
             InfoRow(title: "First name", text: $firstName, isEditing: isEditing)
-            
             
             Divider().background(Color.white.opacity(0.1))
             
             InfoRow(title: "Last name", text: $lastName, isEditing: isEditing)
             
+            Divider().background(Color.white.opacity(0.1))
+            
+            // Email (read-only)
+            HStack {
+                Text("Email")
+                    .foregroundStyle(.white.opacity(0.85))
+                Spacer()
+                Text(user.fields.email)
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
         }
         .background(Color.white.opacity(0.08))
         .cornerRadius(10)
         .padding(.horizontal, 16)
+        .onAppear {
+            // Split name into first and last
+            let nameParts = user.fields.name.split(separator: " ")
+            firstName = String(nameParts.first ?? "")
+            lastName = nameParts.count > 1 ? String(nameParts.last ?? "") : ""
+        }
     }
-    
-    
 }
 
 struct InfoRow: View {
@@ -145,6 +143,8 @@ struct InfoRow: View {
             if isEditing {
                 TextField("", text: $text)
                     .multilineTextAlignment(.trailing)
+                    .foregroundColor(.white)
+                    .accentColor(.yellow)
             } else {
                 Text(text)
                     .foregroundStyle(.white.opacity(0.9))
@@ -155,16 +155,13 @@ struct InfoRow: View {
     }
 }
 
-
-
 struct signoutBtn : View {
     @Binding var isEditing: Bool
     
     var body: some View{
-        // if false do this
         if !isEditing {
             Button(role: .destructive) {
-                // sign out logic
+                // TODO: sign out logic
             } label: {
                 Text("Sign Out")
                     .frame(maxWidth: .infinity)
@@ -176,9 +173,19 @@ struct signoutBtn : View {
             .padding(.horizontal, 16)
             .padding(.bottom, 18)
         }
-        
     }
 }
+
 #Preview {
-    ProfileInfoView()
+    NavigationStack {
+        ProfileInfoView(user: AppUser(
+            id: "recaLvl1OOPjSagCx",
+            fields: UserFields(
+                name: "Sarah Abdullah",
+                password: "password",
+                email: "sarah@example.com",
+                profile_image: "https://source.unsplash.com/200x200/?person"
+            )
+        ))
+    }
 }
