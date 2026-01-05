@@ -10,8 +10,27 @@ import Foundation
 
 func fetchUserFromAPI() async throws -> [AppUser] {
     let data = try await APIClient.fetch("/users")
-    let decoded = try JSONDecoder().decode(UserResponse.self, from: data)
-    return decoded.records
+    
+    let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+    guard let recordsArray = json?["records"] as? [[String: Any]] else {
+        throw URLError(.badServerResponse)
+    }
+    
+    var validUsers: [AppUser] = []
+    
+    for (index, record) in recordsArray.enumerated() {
+        do {
+            let recordData = try JSONSerialization.data(withJSONObject: record)
+            let user = try JSONDecoder().decode(AppUser.self, from: recordData)
+            validUsers.append(user)
+        } catch {
+            print("⚠️ Skipping invalid user at index \(index): \(error.localizedDescription)")
+            // Skip this broken record and continue
+        }
+    }
+    
+    print("✅ Loaded \(validUsers.count) valid users (skipped \(recordsArray.count - validUsers.count) broken records)")
+    return validUsers
 }
 
 func fetchUserDetailsFromAPI(userId: String) async throws -> AppUser {
