@@ -12,9 +12,7 @@ struct MoviesCenterView: View {
     @StateObject private var viewModel = MoviesCenterViewModel()
     let user: AppUser
     
-    //testing
-    
-  //  user = AppUser(id: "recPMaNVKM6yYZFIl", fields: UserFields())
+
     
     @State var moviesList: [Movie] = []
     
