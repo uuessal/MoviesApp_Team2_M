@@ -47,12 +47,15 @@ struct ReviewsSection: View {
                     ForEach(ReviewsList , id: \.id) { Review in
                         
                         let UserNameById = usersById[Review.fields.user_id]?.fields.name ?? "Unknown User"
+                        let UserProfileById = usersById[Review.fields.user_id]?.fields.profile_image ?? "Unknown User"
+
 
                             ReviewCardView(
                                 userName: UserNameById, // قاعد يطلع الاي دي نحتاج نسوي نيتوركنق لابياي اليوزر عشان نسحب الاسم والصورة :)
                                 review: Review.fields.review_text,
                                 rate: Int(Review.fields.rate),
-                                ReviewDate: viewModel.simpleDay(from: Review.createdTime)
+                                ReviewDate: viewModel.simpleDay(from: Review.createdTime),
+                                userProfile : UserProfileById
                             )}
                         
                       
@@ -71,6 +74,7 @@ struct ReviewCardView: View {
     let review: String
     let rate : Int
     let ReviewDate : String
+    let userProfile :String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -78,9 +82,16 @@ struct ReviewCardView: View {
             // Header (Avatar + Name + Stars)
             HStack(alignment: .top, spacing: 12) {
                 // Avatar
-                Circle()
-                    .fill(Color.gray.opacity(0.4))
-                    .frame(width: 44, height: 44)
+                AsyncImage(url: URL(string: userProfile)) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                } placeholder: {
+                    Circle()
+                        .fill(Color.gray.opacity(0.3))
+                }
+                .frame(width: 36, height: 36)
+                .clipShape(Circle())
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(userName)

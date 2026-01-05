@@ -44,6 +44,8 @@ class ReviewViewModel: ObservableObject {
           }
       }
     
+    // ميثود عشان احول التاريخ اللي بال api ليوم
+    
     func simpleDay(from isoDate: String) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ" // صيغة تاريخ الـ API
