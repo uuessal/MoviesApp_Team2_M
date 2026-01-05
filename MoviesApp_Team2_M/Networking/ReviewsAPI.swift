@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: - Fetch Reviews
+// Fetch Reviews
 func fetchReviewsFromAPI(movieId: String) async throws -> [Review] {
     
     let urlString = "/reviews?filterByFormula={movie_id}=\"\(movieId)\""
@@ -24,4 +24,11 @@ func sendReview(reviewFields: ReviewFields) async throws -> Review {
     
     let data = try await APIClient.send("/reviews", body: body)
     return try JSONDecoder().decode(Review.self, from: data)
+}
+
+// Delete a review
+func deleteReviewFromAPI(reviewId: String) async throws {
+    print("Deleting review: \(reviewId)")
+    let _ = try await APIClient.delete("/reviews/\(reviewId)")
+    print("Review deleted successfully")
 }

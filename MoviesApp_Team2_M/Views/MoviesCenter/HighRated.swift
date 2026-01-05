@@ -15,7 +15,7 @@ struct HighRated : View {
     
     var body: some View {
         
-        VStack(alignment: .leading, spacing: 0) { // spacing = 0 لإزالة الفراغ من فوق
+        VStack(alignment: .leading, spacing: 0) {
             
             
             Text("High rated").font(Font.title).bold()
@@ -82,7 +82,7 @@ struct HighRated : View {
                         
                     }
                 }
-                // }
+                
             }.tabViewStyle(.page(indexDisplayMode: .always)).frame(height: 550)
         }
     }

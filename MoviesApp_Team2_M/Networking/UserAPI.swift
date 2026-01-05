@@ -45,14 +45,14 @@ func fetchUserDetailsFromAPI(userId: String) async throws -> AppUser {
 // Update user information
 func updateUserFromAPI(userId: String, name: String, email: String, password: String?, profileImage: String) async throws -> AppUser {
     
-    // Create the request body structure
+    
     struct UpdateUserBody: Encodable {
         let fields: UserFields
     }
     
     let body = UpdateUserBody(fields: UserFields(
         name: name,
-        password: password,  // Keep it optional
+        password: password,
         email: email,
         profile_image: profileImage
     ))

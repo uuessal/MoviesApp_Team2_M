@@ -50,7 +50,7 @@ class ProfileInfoViewModel: ObservableObject {
                 userId: user.id,
                 name: fullName,
                 email: user.fields.email,
-                password: user.fields.password ?? "",  // Unwrap with default empty string
+                password: user.fields.password ?? "",  
                 profileImage: user.fields.profile_image
             )
             

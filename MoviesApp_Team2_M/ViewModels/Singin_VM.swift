@@ -23,7 +23,7 @@ class SigninViewModel: ObservableObject {
         print("   Password: \(password)")
         
         guard !email.isEmpty, !password.isEmpty else {
-            print("❌ Empty email or password")
+            print("Empty email or password")
             errorMessage = "Please enter email and password"
             return
         }

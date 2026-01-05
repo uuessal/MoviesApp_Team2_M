@@ -17,6 +17,8 @@ class MovieDetailsViewModel: ObservableObject {
     @Published var usersList: [AppUser] = []
     @Published var isLoading = true
     @Published var errorMessage: String?
+    @Published var showDeleteSuccessAlert = false
+    @Published var deleteSuccessMessage = ""
     
     func loadData(movieId: String) async {
         do {
@@ -41,4 +43,20 @@ class MovieDetailsViewModel: ObservableObject {
             print("Error loading data: \(error)")
         }
     }
+    
+    func deleteReview(reviewId: String) async {
+        do {
+            try await deleteReviewFromAPI(reviewId: reviewId)
+
+            reviewsList.removeAll { $0.id == reviewId }
+            
+            // message for the user
+            deleteSuccessMessage = "Your review has been deleted successfully."
+            showDeleteSuccessAlert = true
+
+        } catch {
+            errorMessage = "Failed to delete the review. Please try again."
+        }
+    }
+
 }

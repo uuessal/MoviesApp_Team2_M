@@ -4,7 +4,7 @@
 //
 //  Created by Lojaen Jehad Ayash on 03/07/1447 AH.
 //
-//
+
 import Foundation
 
 struct MovieFields: Decodable {

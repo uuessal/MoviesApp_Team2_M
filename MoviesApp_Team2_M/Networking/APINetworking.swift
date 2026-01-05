@@ -75,4 +75,25 @@ struct APIClient {
         
         return data
     }
+    
+    
+    static func delete(_ endpoint: String) async throws -> Data {
+        guard let url = URL(string: baseURL + endpoint) else {
+            throw URLError(.badURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("Bearer \(APIKey.airtable)", forHTTPHeaderField: "Authorization")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        if let httpResponse = response as? HTTPURLResponse,
+           !(200...299).contains(httpResponse.statusCode) {
+            throw URLError(.badServerResponse)
+        }
+        
+        return data
+    }
+    
 }

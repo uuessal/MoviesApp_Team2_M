@@ -51,12 +51,21 @@ struct MoviesDetailsView: View {
 
                     CastSection(actors: viewModel.actors)
 
-                    ReviewsSection(ReviewsList: viewModel.reviewsList, userList: viewModel.usersList, rating: movie.fields.IMDb_rating)
+                    ReviewsSection(ReviewsList: viewModel.reviewsList,
+                                   userList: viewModel.usersList,
+                                   rating: movie.fields.IMDb_rating,
+                                   currentUserId: user.id,  
+                                   onDeleteReview: { reviewId in
+                                           await viewModel.deleteReview(reviewId: reviewId)
+                                       }
+                                   )
                     
                     WriteReviewButton(movieId: movieId, user: user)
                 }
                 .padding(.bottom, 32)
-            } else if let errorMessage = viewModel.errorMessage {
+                
+            }
+            else if let errorMessage = viewModel.errorMessage {
                 VStack(spacing: 16) {
                     Image(systemName: "exclamationmark.triangle")
                         .font(.system(size: 50))
@@ -82,7 +91,18 @@ struct MoviesDetailsView: View {
             await viewModel.loadData(movieId: movieId)
             await savedMovieVM.loadSavedMovies(userId: user.id)
         }
+        
+        .alert(
+            "Deleted",
+            isPresented: $viewModel.showDeleteSuccessAlert
+        ) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(viewModel.deleteSuccessMessage)
+        }
+
     }
+    
 }
 
 
