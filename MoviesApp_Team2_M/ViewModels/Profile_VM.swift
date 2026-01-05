@@ -15,13 +15,24 @@ class ProfileViewModel: ObservableObject {
     @Published var isLoading = true
     @Published var errorMessage: String?
     
-    func loadData(userId: String) async {
+    func loadData(userId: String, savedMovieIds: Set<String>) async {
+        isLoading = true
         do {
             // Fetch user details
             user = try await fetchUserDetailsFromAPI(userId: userId)
             
-            // Fetch saved movies for this user
-            savedMovies = try await fetchSavedMoviesForUser(userId: userId)
+            // If no saved movie IDs, return empty
+            if savedMovieIds.isEmpty {
+                savedMovies = []
+                isLoading = false
+                return
+            }
+            
+            // Fetch all movies
+            let allMovies = try await fetchMoviesFromAPI()
+            
+            // Filter movies that match the saved movie IDs
+            savedMovies = allMovies.filter { savedMovieIds.contains($0.id) }
             
             isLoading = false
         } catch {

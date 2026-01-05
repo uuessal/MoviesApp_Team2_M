@@ -11,7 +11,7 @@ import SwiftUI
 struct MoviesDetailsView: View {
     
     @StateObject private var viewModel = MovieDetailsViewModel()
-    @StateObject private var savedMovieVM = SavedMovieViewModel()
+    @EnvironmentObject var savedMovieVM: SavedMovieViewModel
     let movieId: String
     let user: AppUser
     
@@ -30,8 +30,10 @@ struct MoviesDetailsView: View {
                         posterURL: movie.fields.poster,
                         title: movie.fields.name,
                         movieId: movieId,
-                        userId: user.id,
-                        savedMovieVM: savedMovieVM
+                        isSaved: savedMovieVM.isSaved(movieId),
+                        onSave: {
+                            await savedMovieVM.saveMovie(userId: user.id, movieId: movieId)
+                        }
                     )
 
                     MovieInfoGrid(
@@ -80,19 +82,31 @@ struct MoviesDetailsView: View {
             await viewModel.loadData(movieId: movieId)
             await savedMovieVM.loadSavedMovies(userId: user.id)
         }
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 
 // Header Image
 struct HeaderImageSection: View {
+    @Environment(\.dismiss) private var dismiss
     let posterURL: String
     let title: String
     let movieId: String
-    let userId: String
-    @ObservedObject var savedMovieVM: SavedMovieViewModel
+    let isSaved: Bool
+    var onSave: (() async -> Void)
     
+    
+    @State private var isCurrentlySaved: Bool
+
+    init(posterURL: String, title: String, movieId: String, isSaved: Bool, onSave: @escaping (() async -> Void))  {
+        self.posterURL = posterURL
+        self.title = title
+        self.movieId = movieId
+        self.isSaved = isSaved
+        self.onSave = onSave
+        self._isCurrentlySaved = State(initialValue: isSaved)
+    }
+
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             AsyncImage(url: URL(string: posterURL)) { phase in
@@ -130,39 +144,32 @@ struct HeaderImageSection: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
                 .shadow(color: .black.opacity(0.7), radius: 10, x: 0, y: 0)
-            
-            VStack {
-                HStack(spacing: 16) {
-                    Spacer()
-                    
-                    ShareLink(item: shareText()) {
-                        Image(systemName: "square.and.arrow.up")
-                            .foregroundColor(.yellow)
-                            .font(.system(size: 22))
-                            .padding(12)
-                            .background(Color.black.opacity(0.6))
-                            .clipShape(Circle())
-                    }
-                    
-                    Button {
-                        Task {
-                            await savedMovieVM.toggleSave(userId: userId, movieId: movieId)
-                        }
-                    } label: {
-                        Image(systemName: savedMovieVM.isSaved(movieId) ? "bookmark.fill" : "bookmark")
-                            .foregroundColor(.yellow)
-                            .font(.system(size: 22))
-                            .frame(width: 44, height: 44)
-                    }
-                    .background(Color.black.opacity(0.6))
-                    .clipShape(Circle())
-                    .buttonStyle(PlainButtonStyle())
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                ShareLink(item: shareText()) {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundColor(.yellow)
                 }
-                .padding(.top, 60)
-                .padding(.trailing, 16)
-                
-                Spacer()
             }
+
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                                    if !isCurrentlySaved {
+                                        Task {
+                                            await onSave()
+                                            isCurrentlySaved = true
+                                        }
+                                    }
+                                }) {
+                                    Image(systemName: isCurrentlySaved ? "bookmark.fill" : "bookmark")
+                                        .foregroundColor(.yellow)
+                                }
+                                .disabled(isCurrentlySaved) // Disable if already saved
+                            }
+                        }
+        .onChange(of: isSaved) { newValue in
+            isCurrentlySaved = newValue
         }
     }
     

@@ -30,6 +30,9 @@ class SavedMovieViewModel: ObservableObject {
     @Published var savedMovieIds: Set<String> = []
     @Published var isLoading = false
     
+    // Add a published property to trigger UI updates
+    @Published var lastUpdateTimestamp: Date = Date()
+    
     func loadSavedMovies(userId: String) async {
         isLoading = true
         do {
@@ -37,6 +40,8 @@ class SavedMovieViewModel: ObservableObject {
             
             if let userRecord = allSavedMovies.first(where: { $0.fields.user_id == userId }) {
                 savedMovieIds = Set(userRecord.fields.movie_id)
+            } else {
+                savedMovieIds = []
             }
             
             isLoading = false
@@ -79,6 +84,7 @@ class SavedMovieViewModel: ObservableObject {
                     }
                     
                     savedMovieIds.insert(movieId)
+                    lastUpdateTimestamp = Date() // Trigger update
                 }
             } else {
                 let createBody = SavedMovieCreateRequest(
@@ -102,6 +108,7 @@ class SavedMovieViewModel: ObservableObject {
                 }
                 
                 savedMovieIds.insert(movieId)
+                lastUpdateTimestamp = Date() // Trigger update
             }
         } catch {
             print("Error saving movie: \(error)")
@@ -130,6 +137,7 @@ class SavedMovieViewModel: ObservableObject {
             
             _ = try await APIClient.put("/saved_movies/\(existingRecord.id)", body: updateBody)
             savedMovieIds.remove(movieId)
+            lastUpdateTimestamp = Date() // Trigger update
         } catch {
             print("Error removing movie: \(error)")
         }

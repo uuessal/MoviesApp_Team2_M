@@ -9,6 +9,7 @@ import SwiftUI
 
 struct Profilepage: View {
     @StateObject private var viewModel = ProfileViewModel()
+    @EnvironmentObject var savedMovieVM: SavedMovieViewModel
     let user: AppUser
 
     var body: some View {
@@ -48,26 +49,41 @@ struct Profilepage: View {
                             GridItem(.flexible())
                         ], spacing: 16) {
                             ForEach(viewModel.savedMovies, id: \.id) { movie in
-                                NavigationLink(destination: MoviesDetailsView(movieId: movie.id , user : user)) {
-                                    AsyncImage(url: URL(string: movie.fields.poster)) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 170, height: 225)
-                                            .clipped()
-                                            .cornerRadius(10)
-                                    } placeholder: {
-                                        Rectangle()
-                                            .fill(Color.gray.opacity(0.3))
-                                            .frame(width: 170, height: 225)
-                                            .cornerRadius(10)
-                                            .overlay(
-                                                ProgressView()
-                                                    .progressViewStyle(CircularProgressViewStyle(tint: .yellow))
-                                            )
+                                ZStack(alignment: .topTrailing) {
+                                    NavigationLink(destination: MoviesDetailsView(movieId: movie.id, user: user)) {
+                                        AsyncImage(url: URL(string: movie.fields.poster)) { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 170, height: 225)
+                                                .clipped()
+                                                .cornerRadius(10)
+                                        } placeholder: {
+                                            Rectangle()
+                                                .fill(Color.gray.opacity(0.3))
+                                                .frame(width: 170, height: 225)
+                                                .cornerRadius(10)
+                                                .overlay(
+                                                    ProgressView()
+                                                        .progressViewStyle(CircularProgressViewStyle(tint: .yellow))
+                                                )
+                                        }
                                     }
+                                    .buttonStyle(PlainButtonStyle())
+                                    
+                                    // Remove button
+                                    Button(action: {
+                                        Task {
+                                            await savedMovieVM.removeMovie(userId: user.id, movieId: movie.id)
+                                        }
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.title2)
+                                            .foregroundColor(.red)
+                                            .background(Circle().fill(Color.white))
+                                    }
+                                    .padding(8)
                                 }
-                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                         .padding(.horizontal)
@@ -80,7 +96,14 @@ struct Profilepage: View {
             .navigationTitle("Profile")
             .preferredColorScheme(.dark)
             .task {
-                await viewModel.loadData(userId: user.id)
+                await savedMovieVM.loadSavedMovies(userId: user.id)
+                await viewModel.loadData(userId: user.id, savedMovieIds: savedMovieVM.savedMovieIds)
+            }
+            .onChange(of: savedMovieVM.lastUpdateTimestamp) { _ in
+                // Reload when saved movies change
+                Task {
+                    await viewModel.loadData(userId: user.id, savedMovieIds: savedMovieVM.savedMovieIds)
+                }
             }
         }
     }
@@ -135,4 +158,3 @@ struct ProfileButton: View {
 #Preview {
    // Profilepage(user : user)
 }
-	

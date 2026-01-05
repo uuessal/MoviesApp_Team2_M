@@ -34,7 +34,7 @@ struct InputField: View {
         {
             Spacer()
             
-            Text("Sing in")
+            Text("Sign in")
                 .font(.largeTitle.bold())
                 .foregroundStyle(Color.white)
             Spacer().frame(height: 8)

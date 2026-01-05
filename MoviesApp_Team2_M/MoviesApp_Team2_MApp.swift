@@ -9,11 +9,14 @@ import SwiftUI
 
 @main
 struct MoviesApp_Team2_MApp: App {
+    @StateObject private var savedMovieVM = SavedMovieViewModel()
+    
     var body: some Scene {
         WindowGroup {
             NavigationStack {
                 SigninPage()
             }
+            .environmentObject(savedMovieVM)
         }
     }
 }
