@@ -17,7 +17,8 @@ struct AddReviewView: View {
     @Environment(\.dismiss) var dismiss
     @State private var reviewText: String = ""
     @State private var rating: Int = 0
-
+    @StateObject private var viewModel = ReviewViewModel()
+    
     var body: some View {
         VStack {
             ScrollView {
@@ -86,24 +87,19 @@ struct AddReviewView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
                     
-                    Task { // async context
-                                do {
-                                    let reviewFields = ReviewFields(
-                                        rate: Double(rating), // rating من النجوم
-                                        review_text: reviewText,
-                                        movie_id: movieId , // ممكن تمررين ID الفلم
-                                        user_id: user.id // ID المستخدم الحالي
-                                    )
+                    Task {
+                        
+                        await viewModel.addReview(
+                        rating: rating,
+                        reviewText: reviewText,
+                        movieId: movieId,
+                        userId: user.id
+                    )
 
-                                    let _ = try await sendReview(reviewFields: reviewFields)
-
-                                    // بعد الإرسال، اغلاق الصفحة
-                                    dismiss()
-
-                                } catch {
-                                    print("Failed to post review:", error)
-                                }
-                            }
+                    if viewModel.errorMessage == nil {
+                        dismiss()
+                    }
+                }
                     
                     
                 } label: {

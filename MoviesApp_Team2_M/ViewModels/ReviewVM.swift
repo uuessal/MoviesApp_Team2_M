@@ -12,24 +12,37 @@ import Combine
 
 @MainActor
 class ReviewViewModel: ObservableObject {
-    @Published var isSending: Bool = false
-    @Published var errorMessage: String?
-
-    func sendingReview(_ reviewFields: ReviewFields) async throws {
-        isSending = true
-        errorMessage = nil
-        
-        do {
-            _ = try await sendReview(reviewFields: reviewFields)
-        } catch {
-            errorMessage = error.localizedDescription
-            print("Failed to post review:", error)
-            throw error
-        }
-        
-        isSending = false
-    }
     
+    @Published var isLoading = false
+    @Published var errorMessage: String?
+    
+    func addReview(
+          rating: Int,
+          reviewText: String,
+          movieId: String,
+          userId: String
+      ) async {
+
+          do {
+              isLoading = true
+
+              let reviewFields = ReviewFields(
+                  rate: Double(rating),
+                  review_text: reviewText,
+                  movie_id: movieId,
+                  user_id: userId
+              )
+
+              let _ = try await sendReview(reviewFields: reviewFields)
+
+              isLoading = false
+
+          } catch {
+              errorMessage = error.localizedDescription
+              isLoading = false
+              print("Error adding review: \(error)")
+          }
+      }
     
     func simpleDay(from isoDate: String) -> String {
         let formatter = DateFormatter()
