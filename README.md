@@ -67,11 +67,11 @@ The app integrates with the Airtable REST API using a centralized networking lay
 
 ### Update
 - Update user profile information
-- Update saved movies list
+
 
 **API Endpoints:**
 - PUT `/users/{id}`
-- PUT `/saved_movies/{id}`
+
 
 ---
 
@@ -106,6 +106,6 @@ The app integrates with the Airtable REST API using a centralized networking lay
 
 ## 👥 Team 2
 
-Lojaen Jehad Ayash
-Wessal Hashim Alharbi
-Shahd Hassan Muharraq 
+1. Lojaen Jehad Ayash
+2. Wessal Hashim Alharbi
+3. Shahd Hassan Muharraq 
