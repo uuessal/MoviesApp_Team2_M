@@ -11,9 +11,9 @@ import SwiftUI
 struct MoviesDetailsView: View {
     
     @StateObject private var viewModel = MovieDetailsViewModel()
+    @StateObject private var savedMovieVM = SavedMovieViewModel()
     let movieId: String
-    
-    let user : AppUser
+    let user: AppUser
     
     var body: some View {
         ScrollView {
@@ -26,7 +26,13 @@ struct MoviesDetailsView: View {
             } else if let movie = viewModel.movie {
                 VStack(alignment: .leading, spacing: 24) {
 
-                    HeaderImageSection(posterURL: movie.fields.poster, title: movie.fields.name)
+                    HeaderImageSection(
+                        posterURL: movie.fields.poster,
+                        title: movie.fields.name,
+                        movieId: movieId,
+                        userId: user.id,
+                        savedMovieVM: savedMovieVM
+                    )
 
                     MovieInfoGrid(
                         duration: movie.fields.runtime,
@@ -43,9 +49,9 @@ struct MoviesDetailsView: View {
 
                     CastSection(actors: viewModel.actors)
 
-                    ReviewsSection(ReviewsList: viewModel.reviewsList , userList: viewModel.usersList , rating : movie.fields.IMDb_rating)
+                    ReviewsSection(ReviewsList: viewModel.reviewsList, userList: viewModel.usersList, rating: movie.fields.IMDb_rating)
                     
-                    WriteReviewButton(movieId: movieId , user : user)
+                    WriteReviewButton(movieId: movieId, user: user)
                 }
                 .padding(.bottom, 32)
             } else if let errorMessage = viewModel.errorMessage {
@@ -72,17 +78,21 @@ struct MoviesDetailsView: View {
         .ignoresSafeArea(edges: .top)
         .task {
             await viewModel.loadData(movieId: movieId)
+            await savedMovieVM.loadSavedMovies(userId: user.id)
         }
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 
 // Header Image
 struct HeaderImageSection: View {
-    @Environment(\.dismiss) private var dismiss
     let posterURL: String
     let title: String
-
+    let movieId: String
+    let userId: String
+    @ObservedObject var savedMovieVM: SavedMovieViewModel
+    
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             AsyncImage(url: URL(string: posterURL)) { phase in
@@ -113,7 +123,6 @@ struct HeaderImageSection: View {
             .frame(height: 429)
             .clipped()
             
-            // Title overlay at bottom left
             Text(title)
                 .font(.largeTitle)
                 .fontWeight(.bold)
@@ -121,34 +130,45 @@ struct HeaderImageSection: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
                 .shadow(color: .black.opacity(0.7), radius: 10, x: 0, y: 0)
-        }
-        .toolbar {
-
-            // Share Button
-            ToolbarItem(placement: .navigationBarTrailing) {
-                ShareLink(item: shareText()) {
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundColor(.yellow)
-                }
-            }
-
-            // Bookmark Button
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
+            
+            VStack {
+                HStack(spacing: 16) {
+                    Spacer()
                     
-                }) {
-                    Image(systemName: "bookmark")
-                        .foregroundColor(.yellow)
+                    ShareLink(item: shareText()) {
+                        Image(systemName: "square.and.arrow.up")
+                            .foregroundColor(.yellow)
+                            .font(.system(size: 22))
+                            .padding(12)
+                            .background(Color.black.opacity(0.6))
+                            .clipShape(Circle())
+                    }
+                    
+                    Button {
+                        Task {
+                            await savedMovieVM.toggleSave(userId: userId, movieId: movieId)
+                        }
+                    } label: {
+                        Image(systemName: savedMovieVM.isSaved(movieId) ? "bookmark.fill" : "bookmark")
+                            .foregroundColor(.yellow)
+                            .font(.system(size: 22))
+                            .frame(width: 44, height: 44)
+                    }
+                    .background(Color.black.opacity(0.6))
+                    .clipShape(Circle())
+                    .buttonStyle(PlainButtonStyle())
                 }
+                .padding(.top, 60)
+                .padding(.trailing, 16)
+                
+                Spacer()
             }
         }
     }
     
-    // Helper function to create share text
     private func shareText() -> String {
         return "Check out this movie: \(title)\n\(posterURL)"
     }
-    
 }
 
 
@@ -385,21 +405,15 @@ struct CastItemView: View {
 }
 
 
-// Reviews Section
-// حطيته بملف لحال
-
-
-
 // Review Button
 struct WriteReviewButton: View {
     
     let movieId: String
-    
-    let user : AppUser
+    let user: AppUser
 
     var body: some View {
         NavigationLink {
-            AddReviewView(movieId: movieId , user : user)
+            AddReviewView(movieId: movieId, user: user)
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: "square.and.pencil")
@@ -426,6 +440,6 @@ struct WriteReviewButton: View {
 // Preview
 #Preview {
     NavigationStack {
-     //   MoviesDetailsView(movieId: "reckJmZ458CZcLlUd")
+        // MoviesDetailsView(movieId: "reckJmZ458CZcLlUd")
     }
 }
