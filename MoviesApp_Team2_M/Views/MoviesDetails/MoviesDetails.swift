@@ -154,7 +154,10 @@ struct HeaderImageSection: View {
                     EmptyView()
                 }
             }
-            .frame(height: 429)
+            .frame(
+                width: UIScreen.main.bounds.width,
+                height: 429
+                )
             .clipped()
             
             Text(title)
